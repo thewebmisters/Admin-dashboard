@@ -1,0 +1,38 @@
+/* Dashboard specific styles */
+.dashboard-container {
+    background-color: #f1f5f9;
+}
+
+.stat-card {
+    transition: transform 0.2s ease-in-out;
+}
+
+.stat-card:hover {
+    transform: translateY(-2px);
+}
+
+.sidebar-nav a {
+    transition: all 0.2s ease-in-out;
+}
+
+.sidebar-nav a:hover {
+    background-color: #334155;
+}
+
+.chart-container {
+    position: relative;
+    height: 400px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .sidebar {
+        width: 100%;
+        position: absolute;
+        z-index: 10;
+    }
+
+    .main-content {
+        margin-left: 0;
+    }
+}

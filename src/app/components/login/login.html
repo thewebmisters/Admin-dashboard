@@ -1,0 +1,53 @@
+<div class="bg-slate-100 flex items-center justify-center min-h-screen">
+  <div class="w-full max-w-md">
+    <div class="bg-white p-8 rounded-xl shadow-lg text-center">
+      <div class="flex justify-center items-center mb-4">
+        <i class="pi pi-shield text-3xl text-slate-800"></i>
+        <h1 class="text-3xl font-bold text-slate-800 ml-3">Admin Panel</h1>
+      </div>
+      <p class="text-slate-500 mb-8">Please sign in to continue.</p>
+
+      <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="space-y-6">
+        <div>
+          <input
+            type="email"
+            formControlName="email"
+            placeholder="Email Address"
+            class="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            [class.border-red-500]="email?.invalid && email?.touched"
+          />
+          <div *ngIf="email?.invalid && email?.touched" class="text-red-500 text-sm mt-1 text-left">
+            <span *ngIf="email?.errors?.['required']">Email is required</span>
+            <span *ngIf="email?.errors?.['email']">Please enter a valid email</span>
+          </div>
+        </div>
+        
+        <div>
+          <input
+            type="password"
+            formControlName="password"
+            placeholder="Password"
+            class="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            [class.border-red-500]="password?.invalid && password?.touched"
+          />
+          <div *ngIf="password?.invalid && password?.touched" class="text-red-500 text-sm mt-1 text-left">
+            <span *ngIf="password?.errors?.['required']">Password is required</span>
+            <span *ngIf="password?.errors?.['minlength']">Password must be at least 6 characters</span>
+          </div>
+        </div>
+        
+        <button
+          type="submit"
+          [disabled]="isLoading"
+          class="w-full bg-slate-800 text-white font-bold py-3 px-4 rounded-lg hover:bg-slate-700 transition duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          <span *ngIf="!isLoading">Sign In</span>
+          <span *ngIf="isLoading" class="flex items-center justify-center">
+            <i class="pi pi-spinner pi-spin mr-2"></i>
+            Signing In...
+          </span>
+        </button>
+      </form>
+    </div>
+  </div>
+</div>
