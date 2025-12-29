@@ -1,0 +1,130 @@
+<div class="flex h-screen">
+  <!-- Sidebar Navigation -->
+  <aside class="w-64 bg-slate-800 text-slate-200 flex flex-col">
+    <div class="flex items-center justify-center p-4 border-b border-slate-700">
+      <i class="pi pi-shield text-2xl"></i>
+      <h1 class="text-2xl font-bold ml-2">Admin Panel</h1>
+    </div>
+    <nav class="flex-1 p-4 space-y-2">
+      <a (click)="onNavigate('dashboard')" 
+         class="flex items-center px-4 py-2 bg-slate-700 text-white rounded-lg cursor-pointer">
+        <i class="pi pi-home mr-3"></i> Dashboard
+      </a>
+      <a (click)="onNavigate('profiles')" 
+         class="flex items-center px-4 py-2 hover:bg-slate-700 rounded-lg transition-colors cursor-pointer">
+        <i class="pi pi-users mr-3"></i> Profile Management
+      </a>
+      <a (click)="onNavigate('users')" 
+         class="flex items-center px-4 py-2 hover:bg-slate-700 rounded-lg transition-colors cursor-pointer">
+        <i class="pi pi-user mr-3"></i> User Management
+      </a>
+      <a (click)="onNavigate('chat')" 
+         class="flex items-center px-4 py-2 hover:bg-slate-700 rounded-lg transition-colors cursor-pointer">
+        <i class="pi pi-comments mr-3"></i> Chat Moderation
+      </a>
+      <a (click)="onNavigate('payouts')" 
+         class="flex items-center px-4 py-2 hover:bg-slate-700 rounded-lg transition-colors cursor-pointer">
+        <i class="pi pi-dollar mr-3"></i> Payouts & Earnings
+      </a>
+      <a (click)="onNavigate('reports')" 
+         class="flex items-center px-4 py-2 hover:bg-slate-700 rounded-lg transition-colors cursor-pointer">
+        <i class="pi pi-chart-bar mr-3"></i> Reports
+      </a>
+    </nav>
+    <div class="p-4 border-t border-slate-700">
+      <a (click)="onLogout()" 
+         class="flex items-center px-4 py-2 text-red-400 hover:bg-slate-700 rounded-lg transition-colors cursor-pointer">
+        <i class="pi pi-sign-out mr-3"></i> Logout
+      </a>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="flex-1 flex flex-col overflow-hidden">
+    <header class="bg-white border-b p-4 shadow-sm flex justify-between items-center">
+      <h2 class="text-2xl font-bold text-slate-800">Dashboard</h2>
+      <button 
+        (click)="refreshData()" 
+        class="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+        [disabled]="isLoading"
+      >
+        <i class="pi pi-refresh mr-2" [class.pi-spin]="isLoading"></i>
+        Refresh
+      </button>
+    </header>
+    <div class="flex-1 p-6 overflow-y-auto">
+      <!-- Stat Cards -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+        <div class="bg-white p-6 rounded-lg shadow">
+          <h4 class="text-slate-500 font-semibold">{{ getStatLabels().label1 }}</h4>
+          @if (isLoading) {
+            <div class="animate-pulse">
+              <div class="h-8 bg-slate-200 rounded mt-2"></div>
+            </div>
+          } @else {
+            <p class="text-3xl font-bold text-slate-800 mt-2">{{ getStats().totalRevenue }}</p>
+          }
+        </div>
+        <div class="bg-white p-6 rounded-lg shadow">
+          <h4 class="text-slate-500 font-semibold">{{ getStatLabels().label2 }}</h4>
+          @if (isLoading) {
+            <div class="animate-pulse">
+              <div class="h-8 bg-slate-200 rounded mt-2"></div>
+            </div>
+          } @else {
+            <p class="text-3xl font-bold text-slate-800 mt-2">{{ getStats().activeUsers }}</p>
+          }
+        </div>
+        <div class="bg-white p-6 rounded-lg shadow">
+          <h4 class="text-slate-500 font-semibold">{{ getStatLabels().label3 }}</h4>
+          @if (isLoading) {
+            <div class="animate-pulse">
+              <div class="h-8 bg-slate-200 rounded mt-2"></div>
+            </div>
+          } @else {
+            <p class="text-3xl font-bold text-slate-800 mt-2">{{ getStats().pendingReports }}</p>
+          }
+        </div>
+        <div class="bg-white p-6 rounded-lg shadow">
+          <h4 class="text-slate-500 font-semibold">{{ getStatLabels().label4 }}</h4>
+          @if (isLoading) {
+            <div class="animate-pulse">
+              <div class="h-8 bg-slate-200 rounded mt-2"></div>
+            </div>
+          } @else {
+            <p class="text-3xl font-bold text-red-500 mt-2">{{ getStats().totalMessages }}</p>
+          }
+        </div>
+      </div>
+
+      <!-- Chart -->
+      <div class="bg-white p-6 rounded-lg shadow">
+        <div class="flex justify-between items-center mb-4">
+          <h3 class="font-bold text-lg">
+            @if (userRole === 'admin') {
+              Revenue Over Last 30 Days
+            } @else if (userRole === 'writer') {
+              Earnings Over Time
+            } @else {
+              Spending Over Time
+            }
+          </h3>
+          @if (isLoading) {
+            <div class="animate-pulse">
+              <div class="h-4 bg-slate-200 rounded w-20"></div>
+            </div>
+          }
+        </div>
+        @if (isLoading) {
+          <div class="animate-pulse">
+            <div class="h-64 bg-slate-200 rounded"></div>
+          </div>
+        } @else {
+          <div class="h-64">
+            <canvas #revenueChart></canvas>
+          </div>
+        }
+      </div>
+    </div>
+  </main>
+</div>
