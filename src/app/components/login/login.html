@@ -1,53 +1,122 @@
-<div class="bg-slate-100 flex items-center justify-center min-h-screen">
-  <div class="w-full max-w-md">
-    <div class="bg-white p-8 rounded-xl shadow-lg text-center">
-      <div class="flex justify-center items-center mb-4">
-        <i class="pi pi-shield text-3xl text-slate-800"></i>
-        <h1 class="text-3xl font-bold text-slate-800 ml-3">Admin Panel</h1>
-      </div>
-      <p class="text-slate-500 mb-8">Please sign in to continue.</p>
+<!-- Main container to center the card vertically and horizontally on the page -->
+<div class="container vh-100 d-flex align-items-center justify-content-center bg-light">
+  <!-- CARD: Using Bootstrap's card component to match the original design -->
+  <div class="card shadow-lg p-4 rounded-3" style="max-width: 450px; width: 100%">
+    <div class="card-body">
+      <!-- Header Title -->
+      <h3 class="card-title text-center fw-bold h3 mb-3 text-dark pt-2">Admin Panel</h3>
 
-      <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="space-y-6">
-        <div>
+      <!-- Angular Reactive Form -->
+      <form [formGroup]="loginForm">
+        <!-- Name Field - Standard Bootstrap Input -->
+
+        <!-- Email Field - Standard Bootstrap Input -->
+        <div class="form-group mb-3">
+          <label for="email-signup" class="form-label required fw-semibold">Email Address</label>
           <input
+            id="email-signup"
             type="email"
+            class="form-control"
             formControlName="email"
-            placeholder="Email Address"
-            class="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            [class.border-red-500]="email?.invalid && email?.touched"
+            placeholder="Enter your email"
           />
-          <div *ngIf="email?.invalid && email?.touched" class="text-red-500 text-sm mt-1 text-left">
-            <span *ngIf="email?.errors?.['required']">Email is required</span>
-            <span *ngIf="email?.errors?.['email']">Please enter a valid email</span>
+          <div
+            class="text-danger mt-1"
+            style="font-size: 0.8rem"
+            *ngIf="
+              loginForm.get('email')?.invalid &&
+              (loginForm.get('email')?.dirty || loginForm.get('email')?.touched)
+            "
+          >
+            <div *ngIf="loginForm.get('email')?.errors?.['required']">Email is required</div>
+            <div *ngIf="loginForm.get('email')?.errors?.['pattern']">Invalid Email Address</div>
           </div>
         </div>
-        
-        <div>
-          <input
-            type="password"
-            formControlName="password"
-            placeholder="Password"
-            class="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            [class.border-red-500]="password?.invalid && password?.touched"
-          />
-          <div *ngIf="password?.invalid && password?.touched" class="text-red-500 text-sm mt-1 text-left">
-            <span *ngIf="password?.errors?.['required']">Password is required</span>
-            <span *ngIf="password?.errors?.['minlength']">Password must be at least 6 characters</span>
+
+        <!-- Password Field - Standard Bootstrap Input -->
+        <div class="form-group mb-3">
+          <label for="password-signup" class="form-label required fw-semibold">Password</label>
+          <div class="input-group">
+            <input
+              id="password-signup"
+              [type]="passwordVisible ? 'text' : 'password'"
+              class="form-control"
+              formControlName="password"
+              placeholder="Enter your password"
+            />
+            <!-- The Toggle Button -->
+            <button
+              class="btn btn-outline-secondary btn-icon"
+              type="button"
+              (click)="toggleVisibility('password')"
+              *ngIf="loginForm.get('password')?.value.length > 0"
+            >
+              <!-- Show 'eye' icon when password is not visible -->
+              <i class="pi pi-eye" *ngIf="!passwordVisible"></i>
+              <!-- Show 'eye-slash' icon when password is visible -->
+              <i class="pi pi-eye-slash" *ngIf="passwordVisible"></i>
+            </button>
+          </div>
+          <div
+            class="text-danger mt-1"
+            style="font-size: 0.8rem"
+            *ngIf="
+              loginForm.get('password')?.invalid &&
+              (loginForm.get('password')?.dirty || loginForm.get('password')?.touched)
+            "
+          >
+            <div *ngIf="loginForm.get('password')?.errors?.['required']">Password is required</div>
           </div>
         </div>
-        
+        <div class="d-flex justify-content-end">
+          <button
+            type="button"
+            class="btn btn-link text-sm font-semibold hover:underline text-decoration-none"
+           
+          >
+            Forgot Password?
+          </button>
+        </div>
         <button
           type="submit"
+          class="btn btn-primary w-100 py-2 fw-bold d-flex justify-content-center align-items-center"
+          (click)=" onSubmit()"
           [disabled]="isLoading"
-          class="w-full bg-slate-800 text-white font-bold py-3 px-4 rounded-lg hover:bg-slate-700 transition duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          <span *ngIf="!isLoading">Sign In</span>
-          <span *ngIf="isLoading" class="flex items-center justify-center">
-            <i class="pi pi-spinner pi-spin mr-2"></i>
-            Signing In...
-          </span>
+          <!--  ng-container to conditionally show text or spinner -->
+          <ng-container *ngIf="!isLoading; else loadingSpinner"> Log In with Email </ng-container>
+
+          <!-- This template will be shown when isLoading is true -->
+          <ng-template #loadingSpinner>
+            <div class="spinner-border spinner-border-sm" role="status">
+              <span class="visually-hidden">Loading...</span>
+            </div>
+          </ng-template>
         </button>
       </form>
+
+     <!-- Divider -->
+      <div class="mt-8 pt-6 border-t border-slate-200">
+        <p class="text-center text-xs sm:text-sm text-slate-500">
+          Don't have an account? 
+          <a href="#" class="text-blue-600 hover:text-blue-700 font-medium transition-colors ml-1">
+            Contact Administrator
+          </a>
+        </p>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="text-center mt-6">
+      <p class="text-xs text-slate-500">
+        © 2025 Admin Panel. All rights reserved.
+      </p>
+    </div>
+
+
+    
+
+    
     </div>
   </div>
-</div>
+
