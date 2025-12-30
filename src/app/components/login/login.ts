@@ -59,15 +59,15 @@ export class Login {
           this.messageService.add({
             severity: 'success',
             summary: 'Login Successful',
-            detail: `Welcome back!`,
+            detail: `Welcome back, ${response.user.name}!`,
             life: 3000
           });
 
-          // Redirect based on user role
+          // Redirect based on user role (role is at root level in response)
           if (response.role === 'admin') {
             this.router.navigate(['/dashboard']);
           } else {
-            this.authService.handleApiError('You are not authorized to access this panel!');
+            this.authService.handleApiError('You are not authorized to access this admin panel!');
           }
         },
         error: (err) => {
