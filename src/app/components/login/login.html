@@ -5,12 +5,9 @@
     <div class="card-body">
       <!-- Header Title -->
       <h3 class="card-title text-center fw-bold h3 mb-3 text-dark pt-2">Admin Panel</h3>
-
-      <!-- Angular Reactive Form -->
+<!-- Angular Reactive Form -->
       <form [formGroup]="loginForm">
-        <!-- Name Field - Standard Bootstrap Input -->
-
-        <!-- Email Field - Standard Bootstrap Input -->
+ <!-- Email Field - Standard Bootstrap Input -->
         <div class="form-group mb-3">
           <label for="email-signup" class="form-label required fw-semibold">Email Address</label>
           <input
@@ -32,8 +29,7 @@
             <div *ngIf="loginForm.get('email')?.errors?.['pattern']">Invalid Email Address</div>
           </div>
         </div>
-
-        <!-- Password Field - Standard Bootstrap Input -->
+ <!-- Password Field - Standard Bootstrap Input -->
         <div class="form-group mb-3">
           <label for="password-signup" class="form-label required fw-semibold">Password</label>
           <div class="input-group">
@@ -94,8 +90,7 @@
           </ng-template>
         </button>
       </form>
-
-     <!-- Divider -->
+  <!-- Divider -->
       <div class="mt-8 pt-6 border-t border-slate-200">
         <p class="text-center text-xs sm:text-sm text-slate-500">
           Don't have an account? 
@@ -105,8 +100,7 @@
         </p>
       </div>
     </div>
-
-    <!-- Footer -->
+<!-- Footer -->
     <div class="text-center mt-6">
       <p class="text-xs text-slate-500">
         © 2025 Admin Panel. All rights reserved.
