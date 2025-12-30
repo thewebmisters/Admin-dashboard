@@ -2,7 +2,9 @@ import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
+import { MessageService } from 'primeng/api';
 import { AuthService } from '../../services/auth.service';
+
 
 @Component({
   selector: 'app-login',
@@ -14,16 +16,20 @@ export class Login {
   loginForm: FormGroup;
   isLoading = false;
   errorMessage = '';
-  passwordVisible: boolean = false;
+  passwordVisible = false;
   constructor(
     private formBuilder: FormBuilder,
     private authService: AuthService,
-    private router: Router
+    private router: Router,
+    private messageService: MessageService
   ) {
     this.loginForm = this.formBuilder.group({
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required, Validators.minLength(6)]]
     });
+
+    // Debug: Check if MessageService is properly injected
+    console.log('MessageService injected:', this.messageService);
   }
 
   ngOnInit(): void { }
@@ -39,7 +45,6 @@ export class Login {
   onSubmit(): void {
     if (this.loginForm.valid) {
       this.isLoading = true;
-      this.errorMessage = '';
       const formValues = this.loginForm.value;
       const payload = {
         identifier: formValues.email,
@@ -48,22 +53,18 @@ export class Login {
       this.authService.login(payload).subscribe({
         next: (response) => {
           this.isLoading = false;
-          //console.log('Login successful:', response);
-
           // Redirect based on user role
           const userRole = this.authService.getUserRole();
           if (response.role === 'admin') {
             this.router.navigate(['/dashboard']);
-          } else if (userRole === 'writer') {
-            this.router.navigate(['/dashboard']);
           } else {
-            this.router.navigate(['/dashboard']);
+            this.authService.handleErrors('You are not authorized!');
           }
+          return;
         },
         error: (err) => {
           this.isLoading = false;
-          // console.error('Login error:', error);
-          this.errorMessage = err.error.message || 'Login failed. Please try again.';
+          this.authService.handleApiError(err);
         }
       });
     } else {

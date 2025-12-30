@@ -11,6 +11,7 @@ export interface LoginRequest {
 
 export interface LoginResponse {
     token: string;
+    User: any;
     data: {
         token: string;
         user: {
@@ -96,14 +97,21 @@ export class AuthService {
     isUser(): boolean {
         return this.getUserRole() === 'user';
     }
+    handleErrors(err: any) {
+        this.messageService.add({
+            severity: 'error',
+            summary: 'Error',
+            detail: err || 'Failed to process your request',
+            life: 3000
+        });
+
+    }
     handleApiError(err: any) {
         this.messageService.add({
             severity: 'error',
             summary: 'Error',
-            detail: err.error?.message || 'Failed to load resource',
-            life: 3000,
-            sticky: false,
-            closable: true
+            detail: err.error?.message || 'Failed to process your request',
+            life: 3000
         });
 
     }
