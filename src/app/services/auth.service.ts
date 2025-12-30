@@ -2,7 +2,7 @@ import { Injectable, Inject, PLATFORM_ID } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { Observable, BehaviorSubject } from 'rxjs';
-import { tap } from 'rxjs/operators';
+import { tap, map } from 'rxjs/operators';
 import { MessageService } from 'primeng/api';
 export interface LoginRequest {
     identifier: string;
@@ -11,23 +11,45 @@ export interface LoginRequest {
 
 export interface LoginResponse {
     token: string;
-    User: any;
-    data: {
-        token: string;
-        user: {
-            id: number;
-            name: string;
-            email: string;
-            role: 'admin' | 'writer' | 'user';
-        };
-    };
+    user: User;
+    role: 'admin' | 'writer' | 'user';
+    expires_at: string | null;
 }
 
 export interface User {
     id: number;
     name: string;
     email: string;
-    role: 'admin' | 'writer' | 'user';
+    email_verified_at: string | null;
+    phone: string;
+    phone_verified_at: string | null;
+    bio: string;
+    interests: string[];
+    profile_photo: string;
+    last_seen_at: string | null;
+    verification_status: string;
+    verification_id_photo: string | null;
+    verification_selfie: string | null;
+    verified_at: string | null;
+    verification_notes: string | null;
+    country: string;
+    city: string;
+    age: number;
+    date_of_birth: string;
+    is_active: number;
+    is_suspended: number;
+    suspension_reason: string | null;
+    deleted_at: string | null;
+    two_factor_confirmed_at: string | null;
+    created_at: string;
+    updated_at: string;
+}
+
+export interface AuthState {
+    user: User | null;
+    token: string | null;
+    role: 'admin' | 'writer' | 'user' | null;
+    isAuthenticated: boolean;
 }
 
 @Injectable({
@@ -35,40 +57,87 @@ export interface User {
 })
 export class AuthService {
     private baseUrl = 'https://realspark.jonahdevs.co.ke/api';
-    private currentUserSubject = new BehaviorSubject<User | null>(null);
-    public currentUser$ = this.currentUserSubject.asObservable();
+    private authStateSubject = new BehaviorSubject<AuthState>({
+        user: null,
+        token: null,
+        role: null,
+        isAuthenticated: false
+    });
+
+    public authState$ = this.authStateSubject.asObservable();
+    public currentUser$ = this.authState$.pipe(
+        map(state => state.user)
+    );
 
     constructor(private http: HttpClient, @Inject(PLATFORM_ID) private platformId: Object, private messageService: MessageService) {
-        // Check if user is already logged in (only in browser)
+        // Initialize auth state from localStorage (only in browser)
+        this.initializeAuthState();
+    }
+
+    private initializeAuthState(): void {
         if (isPlatformBrowser(this.platformId)) {
             const token = localStorage.getItem('auth_token');
             const user = localStorage.getItem('current_user');
-            if (token && user) {
+            const role = localStorage.getItem('user_role');
+
+            if (token && user && role) {
                 try {
-                    this.currentUserSubject.next(JSON.parse(user));
+                    const parsedUser = JSON.parse(user);
+                    this.authStateSubject.next({
+                        user: parsedUser,
+                        token: token,
+                        role: role as 'admin' | 'writer' | 'user',
+                        isAuthenticated: true
+                    });
                 } catch (error) {
-                    console.error('Error parsing stored user data:', error);
-                    // Clear corrupted data
-                    localStorage.removeItem('auth_token');
-                    localStorage.removeItem('current_user');
+                    console.error('Error parsing stored auth data:', error);
+                    this.clearAuthData();
                 }
             }
         }
     }
 
-    login(credentials: LoginRequest): Observable<any> {
-        return this.http.post<any>(`${this.baseUrl}/auth/login`, credentials)
+    private clearAuthData(): void {
+        if (isPlatformBrowser(this.platformId)) {
+            localStorage.removeItem('auth_token');
+            localStorage.removeItem('current_user');
+            localStorage.removeItem('user_role');
+        }
+        this.authStateSubject.next({
+            user: null,
+            token: null,
+            role: null,
+            isAuthenticated: false
+        });
+    }
+
+    login(credentials: LoginRequest): Observable<LoginResponse> {
+        return this.http.post<LoginResponse>(`${this.baseUrl}/auth/login`, credentials)
             .pipe(
                 tap(response => {
                     if (response.token && isPlatformBrowser(this.platformId)) {
                         try {
+                            // Store auth data
                             localStorage.setItem('auth_token', response.token);
                             localStorage.setItem('current_user', JSON.stringify(response.user));
-                            this.currentUserSubject.next(response.user);
+                            localStorage.setItem('user_role', response.role);
+
+                            // Update auth state
+                            this.authStateSubject.next({
+                                user: response.user,
+                                token: response.token,
+                                role: response.role,
+                                isAuthenticated: true
+                            });
                         } catch (error) {
-                            console.error('Error storing user data:', error);
-                            // Still update the subject even if localStorage fails
-                            this.currentUserSubject.next(response.user);
+                            console.error('Error storing auth data:', error);
+                            // Still update the state even if localStorage fails
+                            this.authStateSubject.next({
+                                user: response.user,
+                                token: response.token,
+                                role: response.role,
+                                isAuthenticated: true
+                            });
                         }
                     }
                 })
@@ -76,27 +145,27 @@ export class AuthService {
     }
 
     logout(): void {
-        if (isPlatformBrowser(this.platformId)) {
-            localStorage.removeItem('auth_token');
-            localStorage.removeItem('current_user');
-        }
-        this.currentUserSubject.next(null);
+        this.clearAuthData();
     }
 
     isAuthenticated(): boolean {
-        if (isPlatformBrowser(this.platformId)) {
-            return !!localStorage.getItem('auth_token');
-        }
-        return false;
+        return this.authStateSubject.value.isAuthenticated;
     }
 
     getCurrentUser(): User | null {
-        return this.currentUserSubject.value;
+        return this.authStateSubject.value.user;
+    }
+
+    getAuthState(): AuthState {
+        return this.authStateSubject.value;
+    }
+
+    getToken(): string | null {
+        return this.authStateSubject.value.token;
     }
 
     getUserRole(): string | null {
-        const user = this.getCurrentUser();
-        return user ? user.role : null;
+        return this.authStateSubject.value.role;
     }
 
     isAdmin(): boolean {
