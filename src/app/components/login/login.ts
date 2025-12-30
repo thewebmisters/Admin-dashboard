@@ -45,6 +45,7 @@ export class Login {
   onSubmit(): void {
     if (this.loginForm.valid) {
       this.isLoading = true;
+      this.errorMessage = '';
       const formValues = this.loginForm.value;
       const payload = {
         identifier: formValues.email,
@@ -53,14 +54,21 @@ export class Login {
       this.authService.login(payload).subscribe({
         next: (response) => {
           this.isLoading = false;
+
+          // Show success message
+          this.messageService.add({
+            severity: 'success',
+            summary: 'Login Successful',
+            detail: `Welcome back!`,
+            life: 3000
+          });
+
           // Redirect based on user role
-          const userRole = this.authService.getUserRole();
           if (response.role === 'admin') {
             this.router.navigate(['/dashboard']);
           } else {
-            this.authService.handleErrors('You are not authorized!');
+            this.authService.handleApiError('You are not authorized to access this panel!');
           }
-          return;
         },
         error: (err) => {
           this.isLoading = false;
@@ -85,5 +93,20 @@ export class Login {
 
   get password() {
     return this.loginForm.get('password');
+  }
+
+  // Test method to verify toast is working
+  testToast(): void {
+    console.log('Test toast method called');
+    console.log('MessageService:', this.messageService);
+
+    this.messageService.add({
+      severity: 'success',
+      summary: 'Test Toast',
+      detail: 'This is a test toast message to verify it\'s working!',
+      life: 5000
+    });
+
+    console.log('Toast message added to MessageService');
   }
 }
