@@ -9,11 +9,77 @@
 /* Custom styles for PrimeNG components */
 /* Note: PrimeNG v20+ uses CSS-in-JS approach, so no separate CSS files needed */
 
+/* Toast positioning and styling */
+.p-toast {
+    position: fixed !important;
+    top: 20px !important;
+    right: 20px !important;
+    z-index: 99999 !important;
+    width: 350px !important;
+}
+
+.p-toast .p-toast-message {
+    margin: 0 0 1rem 0;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    border-radius: 0.5rem;
+    animation: slideInRight 0.3s ease-out;
+}
+
+@keyframes slideInRight {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+.p-toast .p-toast-message.p-toast-message-success {
+    background: #10b981 !important;
+    border: 1px solid #059669 !important;
+    color: #ffffff !important;
+}
+
+.p-toast .p-toast-message.p-toast-message-error {
+    background: #ef4444 !important;
+    border: 1px solid #dc2626 !important;
+    color: #ffffff !important;
+}
+
+.p-toast .p-toast-message.p-toast-message-warn {
+    background: #f59e0b !important;
+    border: 1px solid #d97706 !important;
+    color: #ffffff !important;
+}
+
+.p-toast .p-toast-message.p-toast-message-info {
+    background: #3b82f6 !important;
+    border: 1px solid #2563eb !important;
+    color: #ffffff !important;
+}
+
 /* Global responsive utilities */
 @media (max-width: 640px) {
     .container-mobile {
         padding-left: 1rem;
         padding-right: 1rem;
+    }
+
+    .p-toast {
+        width: calc(100vw - 2rem) !important;
+        left: 1rem !important;
+        right: 1rem !important;
+        top: 20px !important;
+        position: fixed !important;
+        z-index: 99999 !important;
+    }
+
+    .p-toast .p-toast-message {
+        width: 100% !important;
+        max-width: none !important;
     }
 }
 

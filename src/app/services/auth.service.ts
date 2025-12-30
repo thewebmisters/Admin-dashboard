@@ -11,6 +11,7 @@ export interface LoginRequest {
 
 export interface LoginResponse {
     token: string;
+    User: any;
     data: {
         token: string;
         user: {
@@ -43,7 +44,14 @@ export class AuthService {
             const token = localStorage.getItem('auth_token');
             const user = localStorage.getItem('current_user');
             if (token && user) {
-                this.currentUserSubject.next(JSON.parse(user));
+                try {
+                    this.currentUserSubject.next(JSON.parse(user));
+                } catch (error) {
+                    console.error('Error parsing stored user data:', error);
+                    // Clear corrupted data
+                    localStorage.removeItem('auth_token');
+                    localStorage.removeItem('current_user');
+                }
             }
         }
     }
@@ -53,9 +61,15 @@ export class AuthService {
             .pipe(
                 tap(response => {
                     if (response.token && isPlatformBrowser(this.platformId)) {
-                        localStorage.setItem('auth_token', response.token);
-                        localStorage.setItem('current_user', JSON.stringify(response.user));
-                        this.currentUserSubject.next(response.user);
+                        try {
+                            localStorage.setItem('auth_token', response.token);
+                            localStorage.setItem('current_user', JSON.stringify(response.user));
+                            this.currentUserSubject.next(response.user);
+                        } catch (error) {
+                            console.error('Error storing user data:', error);
+                            // Still update the subject even if localStorage fails
+                            this.currentUserSubject.next(response.user);
+                        }
                     }
                 })
             );
@@ -96,18 +110,55 @@ export class AuthService {
     isUser(): boolean {
         return this.getUserRole() === 'user';
     }
-    handleApiError(err: any) {
-        this.messageService.add({
-            severity: 'error',
-            summary: 'Error',
-            detail: err.error?.message || 'Failed to load resource',
-            life: 3000,
-            sticky: false,
-            closable: true
-        });
 
+    handleApiError(err: any): void {
+        console.error('API Error:', err);
+
+        let errorMessage = 'Failed to process your request';
+
+        // Handle different error structures
+        if (typeof err === 'string') {
+            errorMessage = err;
+        } else if (err?.error?.message) {
+            errorMessage = err.error.message;
+        } else if (err?.message) {
+            errorMessage = err.message;
+        } else if (err?.error) {
+            errorMessage = typeof err.error === 'string' ? err.error : 'An error occurred';
+        }
+
+        // Only show toast if MessageService is available (browser environment)
+        if (this.messageService && isPlatformBrowser(this.platformId)) {
+            this.messageService.add({
+                severity: 'error',
+                summary: 'Error',
+                detail: errorMessage,
+                life: 3000
+            });
+        } else {
+            // Fallback for server-side rendering or when MessageService is not available
+            console.error('Error (MessageService not available):', errorMessage);
+        }
     }
-    handleSuccess(response: any) {
-        this.messageService.add({ severity: 'success', summary: 'Success', detail: response.message || 'success!', life: 300 })
+    handleSuccess(response: any): void {
+        let successMessage = 'Operation completed successfully';
+
+        if (typeof response === 'string') {
+            successMessage = response;
+        } else if (response?.message) {
+            successMessage = response.message;
+        }
+
+        // Only show toast if MessageService is available (browser environment)
+        if (this.messageService && isPlatformBrowser(this.platformId)) {
+            this.messageService.add({
+                severity: 'success',
+                summary: 'Success',
+                detail: successMessage,
+                life: 3000
+            });
+        } else {
+            console.log('Success (MessageService not available):', successMessage);
+        }
     }
 }
