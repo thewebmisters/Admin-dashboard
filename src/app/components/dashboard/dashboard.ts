@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, ElementRef, OnInit, ViewChild, PLATFORM_ID, Inject } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, OnInit, OnDestroy, ViewChild, PLATFORM_ID, Inject } from '@angular/core';
 import { isPlatformBrowser, CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { Chart, registerables } from 'chart.js';
@@ -12,7 +12,7 @@ import { AdminAnalytics, UserAnalytics, WriterAnalytics, ChartData } from '../..
     templateUrl: './dashboard.html',
     styleUrl: './dashboard.css',
 })
-export class Dashboard implements OnInit, AfterViewInit {
+export class Dashboard implements OnInit, AfterViewInit, OnDestroy {
     @ViewChild('revenueChart', { static: false }) revenueChart!: ElementRef<HTMLCanvasElement>;
 
     // Analytics data
@@ -24,6 +24,9 @@ export class Dashboard implements OnInit, AfterViewInit {
     // UI state
     isLoading = true;
     userRole: string | null = null;
+    isMobileMenuOpen = false;
+    autoRefreshInterval: any = null;
+    lastRefreshTime: Date | null = null;
 
     // Chart instance
     private chart: Chart | null = null;
@@ -31,7 +34,7 @@ export class Dashboard implements OnInit, AfterViewInit {
     constructor(
         @Inject(PLATFORM_ID) private platformId: Object,
         private analyticsService: AnalyticsService,
-        private authService: AuthService,
+        public authService: AuthService, // Made public for template access
         private router: Router
     ) {
         if (isPlatformBrowser(this.platformId)) {
@@ -42,6 +45,7 @@ export class Dashboard implements OnInit, AfterViewInit {
     ngOnInit(): void {
         this.userRole = this.authService.getUserRole();
         this.loadAnalytics();
+        this.startAutoRefresh();
     }
 
     ngAfterViewInit(): void {
@@ -56,12 +60,15 @@ export class Dashboard implements OnInit, AfterViewInit {
         if (this.userRole === 'admin') {
             this.analyticsService.getAdminAnalytics().subscribe({
                 next: (response) => {
-                    this.adminStats = response.data;
+                    console.log('Admin analytics response:', response);
+                    this.adminStats = response.analytics; // Note: response.analytics, not response.data
                     this.isLoading = false;
+                    this.lastRefreshTime = new Date();
                 },
                 error: (error) => {
                     console.error('Error loading admin analytics:', error);
                     this.isLoading = false;
+                    // Don't show error toast for now, just use fallback data
                 }
             });
         } else if (this.userRole === 'writer') {
@@ -69,6 +76,7 @@ export class Dashboard implements OnInit, AfterViewInit {
                 next: (response) => {
                     this.writerStats = response.data;
                     this.isLoading = false;
+                    this.lastRefreshTime = new Date();
                 },
                 error: (error) => {
                     console.error('Error loading writer analytics:', error);
@@ -80,6 +88,7 @@ export class Dashboard implements OnInit, AfterViewInit {
                 next: (response) => {
                     this.userStats = response.data;
                     this.isLoading = false;
+                    this.lastRefreshTime = new Date();
                 },
                 error: (error) => {
                     console.error('Error loading user analytics:', error);
@@ -189,7 +198,7 @@ export class Dashboard implements OnInit, AfterViewInit {
         if (this.userRole === 'admin' && this.adminStats) {
             return {
                 totalRevenue: `$${this.adminStats.total_revenue}`,
-                activeUsers: this.adminStats.active_users.toString(),
+                activeUsers: this.adminStats.active_users_today.toString(),
                 pendingReports: this.adminStats.pending_reports.toString(),
                 totalMessages: this.adminStats.total_messages.toString()
             };
@@ -223,7 +232,7 @@ export class Dashboard implements OnInit, AfterViewInit {
         if (this.userRole === 'admin') {
             return {
                 label1: 'Total Revenue',
-                label2: 'Active Users',
+                label2: 'Active Users Today',
                 label3: 'Pending Reports',
                 label4: 'Total Messages'
             };
@@ -259,5 +268,50 @@ export class Dashboard implements OnInit, AfterViewInit {
     refreshData(): void {
         this.loadAnalytics();
         this.loadChartData();
+        this.lastRefreshTime = new Date();
+    }
+
+    toggleMobileMenu(): void {
+        this.isMobileMenuOpen = !this.isMobileMenuOpen;
+    }
+
+    private startAutoRefresh(): void {
+        // Auto-refresh every 5 minutes
+        this.autoRefreshInterval = setInterval(() => {
+            this.refreshData();
+        }, 5 * 60 * 1000);
+    }
+
+    private stopAutoRefresh(): void {
+        if (this.autoRefreshInterval) {
+            clearInterval(this.autoRefreshInterval);
+            this.autoRefreshInterval = null;
+        }
+    }
+
+    ngOnDestroy(): void {
+        this.stopAutoRefresh();
+    }
+
+    getLastRefreshTime(): string {
+        if (!this.lastRefreshTime) return 'Never';
+        return this.lastRefreshTime.toLocaleTimeString();
+    }
+
+    // Helper methods for system health display
+    getStorageUsage(): number {
+        return this.adminStats?.system_health?.storage_usage_percentage || 0;
+    }
+
+    getUptimePercentage(): number {
+        return this.adminStats?.system_health?.uptime_percentage || 0;
+    }
+
+    getResponseTime(): number {
+        return this.adminStats?.system_health?.average_response_time_ms || 0;
+    }
+
+    getDatabaseStatus(): string {
+        return this.adminStats?.system_health?.database_status || 'unknown';
     }
 }

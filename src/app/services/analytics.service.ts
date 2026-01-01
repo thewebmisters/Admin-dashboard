@@ -2,13 +2,13 @@ import { Injectable, Inject, PLATFORM_ID } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { ApiResponse, UserAnalytics, WriterAnalytics, AdminAnalytics, ChartData } from '../models/analytics.model';
+import { ApiResponse, UserAnalytics, WriterAnalytics, AdminAnalytics, AdminAnalyticsResponse, ChartData } from '../models/analytics.model';
 
 @Injectable({
     providedIn: 'root'
 })
 export class AnalyticsService {
-    private baseUrl = 'https://realspark.jonahdevs.co.ke/api'; // Update with your API base URL
+    private baseUrl = 'https://realspark.jonahdevs.co.ke/api';
 
     constructor(private http: HttpClient, @Inject(PLATFORM_ID) private platformId: Object) { }
 
@@ -55,9 +55,9 @@ export class AnalyticsService {
         );
     }
 
-    // Admin Analytics
-    getAdminAnalytics(): Observable<ApiResponse<AdminAnalytics>> {
-        return this.http.get<ApiResponse<AdminAnalytics>>(
+    // Admin Analytics - Updated to match actual API response
+    getAdminAnalytics(): Observable<AdminAnalyticsResponse> {
+        return this.http.get<AdminAnalyticsResponse>(
             `${this.baseUrl}/analytics/admin`,
             { headers: this.getHeaders() }
         );

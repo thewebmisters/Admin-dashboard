@@ -1,118 +1,484 @@
-<div class="flex h-screen">
-  <!-- Sidebar (Same as dashboard) -->
-  <aside class="w-64 bg-slate-800 text-slate-200 flex flex-col">
-    <div class="flex items-center justify-center p-4 border-b border-slate-700">
-      <i class="pi pi-shield text-2xl"></i>
-      <h1 class="text-2xl font-bold ml-2">Admin Panel</h1>
+<div class="container-fluid py-4">
+  <!-- Header -->
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h2 class="h3 mb-1 fw-bold">User Management</h2>
+      <p class="text-muted mb-0">Manage and monitor platform users</p>
     </div>
-    <nav class="flex-1 p-4 space-y-2">
-      <a (click)="onNavigate('dashboard')" 
-         class="flex items-center px-4 py-2 hover:bg-slate-700 rounded-lg transition-colors cursor-pointer">
-        <i class="pi pi-home mr-3"></i> Dashboard
-      </a>
-      <a (click)="onNavigate('users')" 
-         class="flex items-center px-4 py-2 bg-slate-700 text-white rounded-lg cursor-pointer">
-        <i class="pi pi-users mr-3"></i> User Management
-      </a>
-      <a (click)="onNavigate('chat')" 
-         class="flex items-center px-4 py-2 hover:bg-slate-700 rounded-lg transition-colors cursor-pointer">
-        <i class="pi pi-comments mr-3"></i> Chat Moderation
-      </a>
-      <a (click)="onNavigate('payouts')" 
-         class="flex items-center px-4 py-2 hover:bg-slate-700 rounded-lg transition-colors cursor-pointer">
-        <i class="pi pi-dollar mr-3"></i> Payouts & Earnings
-      </a>
-      <a (click)="onNavigate('reports')" 
-         class="flex items-center px-4 py-2 hover:bg-slate-700 rounded-lg transition-colors cursor-pointer">
-        <i class="pi pi-chart-bar mr-3"></i> Reports
-      </a>
-    </nav>
-    <div class="p-4 border-t border-slate-700">
-      <a (click)="onLogout()" 
-         class="flex items-center px-4 py-2 text-red-400 hover:bg-slate-700 rounded-lg transition-colors cursor-pointer">
-        <i class="pi pi-sign-out mr-3"></i> Logout
-      </a>
+    <div class="d-flex gap-2">
+      <button class="btn btn-outline-primary" (click)="loadUsers()">
+        <i class="pi pi-refresh me-2" [class.pi-spin]="isLoading"></i>
+        Refresh
+      </button>
+      <button class="btn btn-primary">
+        <i class="pi pi-plus me-2"></i>
+        Add User
+      </button>
     </div>
-  </aside>
+  </div>
 
-  <!-- Main Content -->
-  <main class="flex-1 flex flex-col overflow-hidden">
-    <header class="bg-white border-b p-4 shadow-sm">
-      <h2 class="text-2xl font-bold text-slate-800">User Management</h2>
-    </header>
-    <div class="flex-1 p-6 overflow-y-auto">
-      <div class="bg-white p-6 rounded-lg shadow">
-        <!-- Table Actions (Search, Filter) -->
-        <div class="flex items-center justify-between mb-4">
-          <input
-            type="text"
-            [(ngModel)]="searchTerm"
-            (input)="onSearch()"
-            placeholder="Search by name or email..."
-            class="border rounded-lg px-4 py-2 w-1/3 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-          <select 
-            [(ngModel)]="selectedFilter"
-            (change)="onFilterChange()"
-            class="border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
-            <option>All Users</option>
-            <option>Clients</option>
-            <option>Writers</option>
-            <option>Suspended</option>
-          </select>
-        </div>
-
-        <!-- Users Table -->
-        <div class="overflow-x-auto">
-          <table class="min-w-full text-sm text-left text-slate-500">
-            <thead class="text-xs text-slate-700 uppercase bg-slate-50">
-              <tr>
-                <th scope="col" class="px-6 py-3">Name</th>
-                <th scope="col" class="px-6 py-3">Role</th>
-                <th scope="col" class="px-6 py-3">Status</th>
-                <th scope="col" class="px-6 py-3">Joined</th>
-                <th scope="col" class="px-6 py-3 text-right">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr *ngFor="let user of filteredUsers" 
-                  class="bg-white border-b hover:bg-slate-50 transition-colors">
-                <td class="px-6 py-4 font-medium text-slate-900">
-                  {{ user.name }}
-                </td>
-                <td class="px-6 py-4">
-                  <span [class]="getRoleClass(user.role)" 
-                        class="text-xs font-semibold px-2 py-1 rounded-full">
-                    {{ user.role }}
-                  </span>
-                </td>
-                <td class="px-6 py-4">
-                  <span [class]="getStatusClass(user.status)" class="font-semibold">
-                    {{ user.status }}
-                  </span>
-                </td>
-                <td class="px-6 py-4">{{ user.joinDate }}</td>
-                <td class="px-6 py-4 text-right">
-                  <button (click)="onViewUser(user)" 
-                          class="font-medium text-blue-600 hover:underline">
-                    View
-                  </button>
-                  <button (click)="onToggleUserStatus(user)" 
-                          [class]="getActionButtonClass(user.status)"
-                          class="font-medium hover:underline ml-4">
-                    {{ getActionButtonText(user.status) }}
-                  </button>
-                </td>
-              </tr>
-              <tr *ngIf="filteredUsers.length === 0">
-                <td colspan="5" class="px-6 py-8 text-center text-slate-500">
-                  No users found matching your criteria.
-                </td>
-              </tr>
-            </tbody>
-          </table>
+  <!-- Stats Cards -->
+  <div class="row g-4 mb-4">
+    <div class="col-md-3">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-body">
+          <div class="d-flex align-items-center">
+            <div class="flex-shrink-0">
+              <div class="bg-primary bg-opacity-10 rounded-3 p-3">
+                <i class="pi pi-users text-primary fs-4"></i>
+              </div>
+            </div>
+            <div class="flex-grow-1 ms-3">
+              <h6 class="text-muted mb-1 fw-semibold">Total Users</h6>
+              @if (isLoadingStats) {
+                <div class="placeholder-glow">
+                  <span class="placeholder col-8 placeholder-lg"></span>
+                </div>
+              } @else {
+                <h4 class="mb-0 fw-bold text-dark">{{ userStats?.total_users || users.length }}</h4>
+              }
+            </div>
+          </div>
         </div>
       </div>
     </div>
-  </main>
+    
+    <div class="col-md-3">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-body">
+          <div class="d-flex align-items-center">
+            <div class="flex-shrink-0">
+              <div class="bg-success bg-opacity-10 rounded-3 p-3">
+                <i class="pi pi-check-circle text-success fs-4"></i>
+              </div>
+            </div>
+            <div class="flex-grow-1 ms-3">
+              <h6 class="text-muted mb-1 fw-semibold">Active Users</h6>
+              @if (isLoadingStats) {
+                <div class="placeholder-glow">
+                  <span class="placeholder col-8 placeholder-lg"></span>
+                </div>
+              } @else {
+                <h4 class="mb-0 fw-bold text-dark">{{ userStats?.active_users || 0 }}</h4>
+              }
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="col-md-3">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-body">
+          <div class="d-flex align-items-center">
+            <div class="flex-shrink-0">
+              <div class="bg-warning bg-opacity-10 rounded-3 p-3">
+                <i class="pi pi-exclamation-triangle text-warning fs-4"></i>
+              </div>
+            </div>
+            <div class="flex-grow-1 ms-3">
+              <h6 class="text-muted mb-1 fw-semibold">Pending Verification</h6>
+              @if (isLoadingStats) {
+                <div class="placeholder-glow">
+                  <span class="placeholder col-8 placeholder-lg"></span>
+                </div>
+              } @else {
+                <h4 class="mb-0 fw-bold text-dark">{{ userStats?.pending_verification || 0 }}</h4>
+              }
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="col-md-3">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-body">
+          <div class="d-flex align-items-center">
+            <div class="flex-shrink-0">
+              <div class="bg-danger bg-opacity-10 rounded-3 p-3">
+                <i class="pi pi-ban text-danger fs-4"></i>
+              </div>
+            </div>
+            <div class="flex-grow-1 ms-3">
+              <h6 class="text-muted mb-1 fw-semibold">Suspended Users</h6>
+              @if (isLoadingStats) {
+                <div class="placeholder-glow">
+                  <span class="placeholder col-8 placeholder-lg"></span>
+                </div>
+              } @else {
+                <h4 class="mb-0 fw-bold text-dark">{{ userStats?.suspended_users || 0 }}</h4>
+              }
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filters and Search -->
+  <div class="card border-0 shadow-sm mb-4">
+    <div class="card-body">
+      <div class="row g-3">
+        <div class="col-md-4">
+          <div class="input-group">
+            <span class="input-group-text bg-light border-end-0">
+              <i class="pi pi-search text-muted"></i>
+            </span>
+            <input 
+              type="text" 
+              class="form-control border-start-0" 
+              placeholder="Search users..."
+              [(ngModel)]="searchTerm"
+              (input)="onSearch()"
+            >
+          </div>
+        </div>
+        
+        <div class="col-md-2">
+          <select 
+            class="form-select" 
+            [(ngModel)]="statusFilter"
+            (change)="onFilterChange()"
+          >
+            <option value="all">All Status</option>
+            <option value="active">Active</option>
+            <option value="suspended">Suspended</option>
+          </select>
+        </div>
+        
+        <div class="col-md-2">
+          <select 
+            class="form-select" 
+            [(ngModel)]="verificationFilter"
+            (change)="onFilterChange()"
+          >
+            <option value="all">All Verification</option>
+            <option value="verified">Verified</option>
+            <option value="pending">Pending</option>
+            <option value="rejected">Rejected</option>
+          </select>
+        </div>
+        
+        <div class="col-md-2">
+          <select 
+            class="form-select" 
+            [(ngModel)]="roleFilter"
+            (change)="onFilterChange()"
+          >
+            <option value="all">All Roles</option>
+            <option value="user">Users</option>
+            <option value="writer">Writers</option>
+            <option value="admin">Admins</option>
+          </select>
+        </div>
+        
+        <div class="col-md-2">
+          <select 
+            class="form-select" 
+            [(ngModel)]="sortBy"
+            (change)="onSortChange()"
+          >
+            <option value="created_at">Join Date</option>
+            <option value="name">Name</option>
+            <option value="last_seen_at">Last Seen</option>
+          </select>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Users Table -->
+  <div class="card border-0 shadow-sm">
+    <div class="card-body p-0">
+      @if (isLoading) {
+        <div class="text-center py-5">
+          <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+          </div>
+          <p class="mt-3 text-muted">Loading users...</p>
+        </div>
+      } @else if (users.length === 0) {
+        <div class="text-center py-5">
+          <i class="pi pi-users text-muted" style="font-size: 3rem;"></i>
+          <h5 class="mt-3 text-muted">No users found</h5>
+          <p class="text-muted">Try adjusting your search criteria</p>
+        </div>
+      } @else {
+        <div class="table-responsive">
+          <table class="table table-hover mb-0">
+            <thead class="table-light">
+              <tr>
+                <th class="border-0 fw-semibold">User</th>
+                <th class="border-0 fw-semibold">Role</th>
+                <th class="border-0 fw-semibold">Status</th>
+                <th class="border-0 fw-semibold">Verification</th>
+                <th class="border-0 fw-semibold">Last Seen</th>
+                <th class="border-0 fw-semibold">Joined</th>
+                <th class="border-0 fw-semibold text-end">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (user of users; track user.id) {
+                <tr class="align-middle">
+                  <td class="py-3">
+                    <div class="d-flex align-items-center">
+                      <img 
+                        [src]="user.profile_photo || 'https://via.placeholder.com/40x40?text=' + user.name.charAt(0)" 
+                        [alt]="user.name"
+                        class="rounded-circle me-3"
+                        style="width: 40px; height: 40px; object-fit: cover;"
+                      >
+                      <div>
+                        <div class="fw-semibold">{{ user.name }}</div>
+                        <small class="text-muted">{{ user.email }}</small>
+                      </div>
+                    </div>
+                  </td>
+                  <td>
+                    <span class="badge rounded-pill" [class]="getRoleClass(user.role || 'user')">
+                      {{ (user.role || 'user') | titlecase }}
+                    </span>
+                  </td>
+                  <td>
+                    <span class="badge rounded-pill" [class]="getStatusClass(user)">
+                      @if (user.is_suspended) {
+                        Suspended
+                      } @else if (user.is_active) {
+                        Active
+                      } @else {
+                        Inactive
+                      }
+                    </span>
+                  </td>
+                  <td>
+                    <span class="badge rounded-pill" [class]="getVerificationClass(user.verification_status)">
+                      {{ user.verification_status | titlecase }}
+                    </span>
+                  </td>
+                  <td>
+                    @if (user.last_seen_at) {
+                      <small class="text-muted">{{ formatDateTime(user.last_seen_at) }}</small>
+                    } @else {
+                      <small class="text-muted">Never</small>
+                    }
+                  </td>
+                  <td>
+                    <small class="text-muted">{{ formatDate(user.created_at) }}</small>
+                  </td>
+                  <td class="text-end">
+                    <div class="dropdown">
+                      <button 
+                        class="btn btn-sm btn-outline-secondary dropdown-toggle" 
+                        type="button" 
+                        [id]="'userActions' + user.id"
+                        data-bs-toggle="dropdown" 
+                        aria-expanded="false"
+                      >
+                        Actions
+                      </button>
+                      <ul class="dropdown-menu dropdown-menu-end" [attr.aria-labelledby]="'userActions' + user.id">
+                        <li><a class="dropdown-item" (click)="onViewUser(user)"><i class="pi pi-eye me-2"></i>View Details</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        @if (user.verification_status === 'pending') {
+                          <li><a class="dropdown-item text-success" (click)="updateVerificationStatus(user, 'verified')"><i class="pi pi-check me-2"></i>Verify</a></li>
+                          <li><a class="dropdown-item text-danger" (click)="updateVerificationStatus(user, 'rejected')"><i class="pi pi-times me-2"></i>Reject</a></li>
+                          <li><hr class="dropdown-divider"></li>
+                        }
+                        <li><a class="dropdown-item" (click)="resetPassword(user)"><i class="pi pi-key me-2"></i>Reset Password</a></li>
+                        @if (user.is_suspended) {
+                          <li><a class="dropdown-item text-success" (click)="confirmUnsuspend(user)"><i class="pi pi-check me-2"></i>Unsuspend</a></li>
+                        } @else {
+                          <li><a class="dropdown-item text-warning" (click)="onSuspendUser(user)"><i class="pi pi-ban me-2"></i>Suspend</a></li>
+                        }
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item text-danger" (click)="onDeleteUser(user)"><i class="pi pi-trash me-2"></i>Delete</a></li>
+                      </ul>
+                    </div>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Pagination -->
+        @if (totalPages > 1) {
+          <div class="card-footer bg-light border-0">
+            <div class="d-flex justify-content-between align-items-center">
+              <div class="text-muted small">
+                Showing {{ (currentPage - 1) * perPage + 1 }} to {{ Math.min(currentPage * perPage, totalUsers) }} of {{ totalUsers }} users
+              </div>
+              <nav aria-label="Users pagination">
+                <ul class="pagination pagination-sm mb-0">
+                  <li class="page-item" [class.disabled]="currentPage === 1">
+                    <a class="page-link" (click)="onPageChange(currentPage - 1)" aria-label="Previous">
+                      <span aria-hidden="true">&laquo;</span>
+                    </a>
+                  </li>
+                  @for (page of getPageNumbers(); track page) {
+                    <li class="page-item" [class.active]="page === currentPage">
+                      <a class="page-link" (click)="onPageChange(page)">{{ page }}</a>
+                    </li>
+                  }
+                  <li class="page-item" [class.disabled]="currentPage === totalPages">
+                    <a class="page-link" (click)="onPageChange(currentPage + 1)" aria-label="Next">
+                      <span aria-hidden="true">&raquo;</span>
+                    </a>
+                  </li>
+                </ul>
+              </nav>
+            </div>
+          </div>
+        }
+      }
+    </div>
+  </div>
 </div>
+
+<!-- User Details Modal -->
+@if (showUserModal && selectedUser) {
+  <div class="modal fade show d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.5);">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">User Details</h5>
+          <button type="button" class="btn-close" (click)="closeModal()"></button>
+        </div>
+        <div class="modal-body">
+          <div class="row">
+            <div class="col-md-4 text-center">
+              <img 
+                [src]="selectedUser.profile_photo || 'https://via.placeholder.com/150x150?text=' + selectedUser.name.charAt(0)" 
+                [alt]="selectedUser.name"
+                class="rounded-circle mb-3"
+                style="width: 150px; height: 150px; object-fit: cover;"
+              >
+              <h5>{{ selectedUser.name }}</h5>
+              <p class="text-muted">{{ selectedUser.email }}</p>
+            </div>
+            <div class="col-md-8">
+              <div class="row g-3">
+                <div class="col-6">
+                  <strong>Phone:</strong><br>
+                  <span class="text-muted">{{ selectedUser.phone || 'Not provided' }}</span>
+                </div>
+                <div class="col-6">
+                  <strong>Age:</strong><br>
+                  <span class="text-muted">{{ selectedUser.age }}</span>
+                </div>
+                <div class="col-6">
+                  <strong>Location:</strong><br>
+                  <span class="text-muted">{{ selectedUser.city }}, {{ selectedUser.country }}</span>
+                </div>
+                <div class="col-6">
+                  <strong>Role:</strong><br>
+                  <span class="badge" [class]="getRoleClass(selectedUser.role || 'user')">
+                    {{ (selectedUser.role || 'user') | titlecase }}
+                  </span>
+                </div>
+                <div class="col-12">
+                  <strong>Bio:</strong><br>
+                  <span class="text-muted">{{ selectedUser.bio || 'No bio provided' }}</span>
+                </div>
+                <div class="col-12">
+                  <strong>Interests:</strong><br>
+                  @if (selectedUser.interests && selectedUser.interests.length > 0) {
+                    @for (interest of selectedUser.interests; track interest) {
+                      <span class="badge bg-light text-dark me-1">{{ interest }}</span>
+                    }
+                  } @else {
+                    <span class="text-muted">No interests listed</span>
+                  }
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" (click)="closeModal()">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- Suspend User Modal -->
+@if (showSuspendModal && selectedUser) {
+  <div class="modal fade show d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.5);">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Suspend User</h5>
+          <button type="button" class="btn-close" (click)="closeModal()"></button>
+        </div>
+        <form [formGroup]="suspendForm" (ngSubmit)="confirmSuspend()">
+          <div class="modal-body">
+            <p>Are you sure you want to suspend <strong>{{ selectedUser.name }}</strong>?</p>
+            <div class="mb-3">
+              <label for="suspendReason" class="form-label">Reason for suspension</label>
+              <textarea 
+                class="form-control" 
+                id="suspendReason"
+                formControlName="reason"
+                rows="3"
+                placeholder="Enter the reason for suspension..."
+              ></textarea>
+              @if (suspendForm.get('reason')?.invalid && suspendForm.get('reason')?.touched) {
+                <div class="text-danger small mt-1">Reason is required</div>
+              }
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" (click)="closeModal()">Cancel</button>
+            <button 
+              type="submit" 
+              class="btn btn-warning"
+              [disabled]="suspendForm.invalid || isUpdating"
+            >
+              @if (isUpdating) {
+                <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+              }
+              Suspend User
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- Delete User Modal -->
+@if (showDeleteModal && selectedUser) {
+  <div class="modal fade show d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.5);">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Delete User</h5>
+          <button type="button" class="btn-close" (click)="closeModal()"></button>
+        </div>
+        <div class="modal-body">
+          <p>Are you sure you want to permanently delete <strong>{{ selectedUser.name }}</strong>?</p>
+          <div class="alert alert-danger">
+            <i class="pi pi-exclamation-triangle me-2"></i>
+            This action cannot be undone. All user data will be permanently removed.
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" (click)="closeModal()">Cancel</button>
+          <button 
+            type="button" 
+            class="btn btn-danger"
+            (click)="confirmDelete()"
+            [disabled]="isUpdating"
+          >
+            @if (isUpdating) {
+              <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+            }
+            Delete User
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+}
