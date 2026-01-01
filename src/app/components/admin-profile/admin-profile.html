@@ -1,0 +1,451 @@
+<div class="container-fluid py-4">
+  <!-- Header -->
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h2 class="h3 mb-1 text-dark fw-bold">Admin Profile</h2>
+      <p class="text-muted mb-0">Manage your account settings and profile information</p>
+    </div>
+    <button class="btn btn-outline-secondary" (click)="loadAccountDetails()">
+      <i class="pi pi-refresh me-2"></i>
+      Refresh
+    </button>
+  </div>
+
+  @if (isLoading) {
+    <!-- Loading State -->
+    <div class="row">
+      <div class="col-12">
+        <div class="card border-0 shadow-sm">
+          <div class="card-body text-center py-5">
+            <div class="spinner-border text-primary" role="status">
+              <span class="visually-hidden">Loading...</span>
+            </div>
+            <p class="mt-3 text-muted">Loading your profile...</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  } @else if (accountDetails) {
+    <!-- Profile Content -->
+    <div class="row">
+      <!-- Profile Overview Card -->
+      <div class="col-12 col-lg-4 mb-4">
+        <div class="card border-0 shadow-sm h-100">
+          <div class="card-body text-center">
+            <div class="position-relative d-inline-block mb-3">
+              <img 
+                [src]="accountDetails.profile_photo || 'https://via.placeholder.com/120x120?text=No+Photo'" 
+                alt="Profile Photo"
+                class="rounded-circle"
+                style="width: 120px; height: 120px; object-fit: cover;"
+              >
+              <div class="position-absolute bottom-0 end-0">
+                <span class="badge rounded-pill" 
+                      [class]="getVerificationStatusClass(accountDetails.verification_status)">
+                  {{ accountDetails.verification_status | titlecase }}
+                </span>
+              </div>
+            </div>
+            
+            <h5 class="fw-bold mb-1">{{ accountDetails.name }}</h5>
+            <p class="text-muted mb-3">{{ accountDetails.email }}</p>
+            
+            <div class="row text-center">
+              <div class="col-6">
+                <div class="border-end">
+                  <h6 class="fw-bold mb-0">{{ accountDetails.age }}</h6>
+                  <small class="text-muted">Age</small>
+                </div>
+              </div>
+              <div class="col-6">
+                <h6 class="fw-bold mb-0">{{ galleryPhotos.length }}</h6>
+                <small class="text-muted">Gallery Photos</small>
+              </div>
+            </div>
+            
+            <hr class="my-3">
+            
+            <div class="text-start">
+              <div class="d-flex align-items-center mb-2">
+                <i class="pi pi-map-marker text-muted me-2"></i>
+                <span class="small">{{ accountDetails.city }}, {{ accountDetails.country }}</span>
+              </div>
+              <div class="d-flex align-items-center mb-2">
+                <i class="pi pi-phone text-muted me-2"></i>
+                <span class="small">{{ accountDetails.phone || 'Not provided' }}</span>
+              </div>
+              <div class="d-flex align-items-center">
+                <i class="pi pi-calendar text-muted me-2"></i>
+                <span class="small">Joined {{ formatDate(accountDetails.created_at) }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Main Content -->
+      <div class="col-12 col-lg-8">
+        <!-- Tab Navigation -->
+        <div class="card border-0 shadow-sm">
+          <div class="card-header bg-white border-0">
+            <ul class="nav nav-tabs card-header-tabs">
+              <li class="nav-item">
+                <button 
+                  class="nav-link" 
+                  [class.active]="activeTab === 'profile'"
+                  (click)="setActiveTab('profile')"
+                  type="button"
+                >
+                  <i class="pi pi-user me-2"></i>Profile Details
+                </button>
+              </li>
+              <li class="nav-item">
+                <button 
+                  class="nav-link" 
+                  [class.active]="activeTab === 'photo'"
+                  (click)="setActiveTab('photo')"
+                  type="button"
+                >
+                  <i class="pi pi-image me-2"></i>Profile Photo
+                </button>
+              </li>
+              <li class="nav-item">
+                <button 
+                  class="nav-link" 
+                  [class.active]="activeTab === 'password'"
+                  (click)="setActiveTab('password')"
+                  type="button"
+                >
+                  <i class="pi pi-lock me-2"></i>Password
+                </button>
+              </li>
+              <li class="nav-item">
+                <button 
+                  class="nav-link" 
+                  [class.active]="activeTab === 'gallery'"
+                  (click)="setActiveTab('gallery')"
+                  type="button"
+                >
+                  <i class="pi pi-images me-2"></i>Gallery
+                </button>
+              </li>
+            </ul>
+          </div>
+
+          <div class="card-body">
+            <!-- Profile Details Tab -->
+            @if (activeTab === 'profile') {
+              <form [formGroup]="profileForm" (ngSubmit)="updateProfile()">
+                <div class="row">
+                  <div class="col-12 col-md-6 mb-3">
+                    <label for="name" class="form-label fw-semibold">Full Name</label>
+                    <input 
+                      type="text" 
+                      class="form-control" 
+                      id="name"
+                      formControlName="name"
+                      placeholder="Enter your full name"
+                    >
+                    @if (profileForm.get('name')?.invalid && profileForm.get('name')?.touched) {
+                      <div class="text-danger small mt-1">Name is required</div>
+                    }
+                  </div>
+                  
+                  <div class="col-12 col-md-6 mb-3">
+                    <label for="phone" class="form-label fw-semibold">Phone Number</label>
+                    <input 
+                      type="tel" 
+                      class="form-control" 
+                      id="phone"
+                      formControlName="phone"
+                      placeholder="Enter your phone number"
+                    >
+                  </div>
+                  
+                  <div class="col-12 mb-3">
+                    <label for="bio" class="form-label fw-semibold">Bio</label>
+                    <textarea 
+                      class="form-control" 
+                      id="bio"
+                      formControlName="bio"
+                      rows="3"
+                      placeholder="Tell us about yourself..."
+                    ></textarea>
+                  </div>
+                  
+                  <div class="col-12 col-md-6 mb-3">
+                    <label for="age" class="form-label fw-semibold">Age</label>
+                    <input 
+                      type="number" 
+                      class="form-control" 
+                      id="age"
+                      formControlName="age"
+                      min="18"
+                      max="100"
+                      placeholder="Enter your age"
+                    >
+                  </div>
+                  
+                  <div class="col-12 col-md-6 mb-3">
+                    <label for="date_of_birth" class="form-label fw-semibold">Date of Birth</label>
+                    <input 
+                      type="date" 
+                      class="form-control" 
+                      id="date_of_birth"
+                      formControlName="date_of_birth"
+                    >
+                  </div>
+                  
+                  <div class="col-12 col-md-6 mb-3">
+                    <label for="country" class="form-label fw-semibold">Country</label>
+                    <input 
+                      type="text" 
+                      class="form-control" 
+                      id="country"
+                      formControlName="country"
+                      placeholder="Enter your country"
+                    >
+                  </div>
+                  
+                  <div class="col-12 col-md-6 mb-3">
+                    <label for="city" class="form-label fw-semibold">City</label>
+                    <input 
+                      type="text" 
+                      class="form-control" 
+                      id="city"
+                      formControlName="city"
+                      placeholder="Enter your city"
+                    >
+                  </div>
+                  
+                  <div class="col-12 mb-3">
+                    <label for="interests" class="form-label fw-semibold">Interests</label>
+                    <input 
+                      type="text" 
+                      class="form-control" 
+                      id="interests"
+                      formControlName="interests"
+                      placeholder="Enter interests separated by commas"
+                    >
+                    <div class="form-text">Separate multiple interests with commas</div>
+                  </div>
+                </div>
+                
+                <div class="d-flex justify-content-end">
+                  <button 
+                    type="submit" 
+                    class="btn btn-primary"
+                    [disabled]="profileForm.invalid || isUpdating"
+                  >
+                    @if (isUpdating) {
+                      <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+                    }
+                    Update Profile
+                  </button>
+                </div>
+              </form>
+            }
+
+            <!-- Profile Photo Tab -->
+            @if (activeTab === 'photo') {
+              <div class="text-center">
+                <div class="mb-4">
+                  <img 
+                    [src]="accountDetails.profile_photo || 'https://via.placeholder.com/200x200?text=No+Photo'" 
+                    alt="Current Profile Photo"
+                    class="rounded-circle border"
+                    style="width: 200px; height: 200px; object-fit: cover;"
+                  >
+                </div>
+                
+                <div class="mb-3">
+                  <input 
+                    type="file" 
+                    class="form-control" 
+                    id="profilePhoto"
+                    accept="image/*"
+                    (change)="onProfilePhotoSelected($event)"
+                  >
+                  <div class="form-text">Choose a new profile photo (JPG, PNG, GIF)</div>
+                </div>
+                
+                <div class="d-flex justify-content-center gap-2">
+                  <button 
+                    class="btn btn-primary"
+                    (click)="updateProfilePhoto()"
+                    [disabled]="!selectedProfilePhoto || isUpdating"
+                  >
+                    @if (isUpdating) {
+                      <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+                    }
+                    Upload Photo
+                  </button>
+                  
+                  @if (accountDetails.profile_photo) {
+                    <button 
+                      class="btn btn-outline-danger"
+                      (click)="deleteProfilePhoto()"
+                      [disabled]="isUpdating"
+                    >
+                      Delete Photo
+                    </button>
+                  }
+                </div>
+              </div>
+            }
+
+            <!-- Password Tab -->
+            @if (activeTab === 'password') {
+              <form [formGroup]="passwordForm" (ngSubmit)="updatePassword()">
+                <div class="row">
+                  <div class="col-12 mb-3">
+                    <label for="current_password" class="form-label fw-semibold">Current Password</label>
+                    <input 
+                      type="password" 
+                      class="form-control" 
+                      id="current_password"
+                      formControlName="current_password"
+                      placeholder="Enter your current password"
+                    >
+                  </div>
+                  
+                  <div class="col-12 col-md-6 mb-3">
+                    <label for="password" class="form-label fw-semibold">New Password</label>
+                    <input 
+                      type="password" 
+                      class="form-control" 
+                      id="password"
+                      formControlName="password"
+                      placeholder="Enter new password"
+                    >
+                    @if (passwordForm.get('password')?.invalid && passwordForm.get('password')?.touched) {
+                      <div class="text-danger small mt-1">Password must be at least 8 characters</div>
+                    }
+                  </div>
+                  
+                  <div class="col-12 col-md-6 mb-3">
+                    <label for="password_confirmation" class="form-label fw-semibold">Confirm New Password</label>
+                    <input 
+                      type="password" 
+                      class="form-control" 
+                      id="password_confirmation"
+                      formControlName="password_confirmation"
+                      placeholder="Confirm new password"
+                    >
+                    @if (passwordForm.hasError('passwordMismatch') && passwordForm.get('password_confirmation')?.touched) {
+                      <div class="text-danger small mt-1">Passwords do not match</div>
+                    }
+                  </div>
+                </div>
+                
+                <div class="d-flex justify-content-end">
+                  <button 
+                    type="submit" 
+                    class="btn btn-primary"
+                    [disabled]="passwordForm.invalid || isUpdating"
+                  >
+                    @if (isUpdating) {
+                      <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+                    }
+                    Update Password
+                  </button>
+                </div>
+              </form>
+            }
+
+            <!-- Gallery Tab -->
+            @if (activeTab === 'gallery') {
+              <!-- Add New Photo -->
+              <div class="card bg-light mb-4">
+                <div class="card-body">
+                  <h6 class="card-title fw-semibold">Add New Photo</h6>
+                  <div class="row">
+                    <div class="col-12 col-md-6 mb-3">
+                      <input 
+                        type="file" 
+                        class="form-control" 
+                        accept="image/*"
+                        (change)="onGalleryPhotoSelected($event)"
+                      >
+                    </div>
+                    <div class="col-12 col-md-4 mb-3">
+                      <input 
+                        type="text" 
+                        class="form-control" 
+                        placeholder="Photo caption (optional)"
+                        [(ngModel)]="galleryCaption"
+                      >
+                    </div>
+                    <div class="col-12 col-md-2">
+                      <button 
+                        class="btn btn-primary w-100"
+                        (click)="addGalleryPhoto()"
+                        [disabled]="!selectedGalleryPhoto"
+                      >
+                        Add Photo
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Gallery Grid -->
+              @if (galleryPhotos.length > 0) {
+                <div class="row g-3">
+                  @for (photo of galleryPhotos; track photo.id) {
+                    <div class="col-6 col-md-4 col-lg-3">
+                      <div class="card">
+                        <img 
+                          [src]="photo.photo_path" 
+                          [alt]="photo.caption || 'Gallery photo'"
+                          class="card-img-top"
+                          style="height: 200px; object-fit: cover;"
+                        >
+                        <div class="card-body p-2">
+                          @if (photo.caption) {
+                            <p class="card-text small mb-2">{{ photo.caption }}</p>
+                          }
+                          <div class="d-flex justify-content-between align-items-center">
+                            <small class="text-muted">{{ formatDate(photo.created_at) }}</small>
+                            <button 
+                              class="btn btn-outline-danger btn-sm"
+                              (click)="deleteGalleryPhoto(photo.id)"
+                            >
+                              <i class="pi pi-trash"></i>
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  }
+                </div>
+              } @else {
+                <div class="text-center py-5">
+                  <i class="pi pi-images text-muted" style="font-size: 3rem;"></i>
+                  <h6 class="mt-3 text-muted">No photos in gallery</h6>
+                  <p class="text-muted">Add your first photo using the form above</p>
+                </div>
+              }
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+  } @else {
+    <!-- Error State -->
+    <div class="row">
+      <div class="col-12">
+        <div class="card border-0 shadow-sm">
+          <div class="card-body text-center py-5">
+            <i class="pi pi-exclamation-triangle text-warning" style="font-size: 3rem;"></i>
+            <h5 class="mt-3">Unable to Load Profile</h5>
+            <p class="text-muted">There was an error loading your profile information.</p>
+            <button class="btn btn-primary" (click)="loadAccountDetails()">
+              Try Again
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+</div>

@@ -1,0 +1,182 @@
+<div class="container-fluid py-4">
+  <div class="row">
+    <div class="col-12">
+      <!-- Header -->
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+          <h2 class="h3 mb-1 fw-bold">Chat Management</h2>
+          <p class="text-muted mb-0">Monitor and manage chat conversations</p>
+        </div>
+        <button class="btn btn-primary" (click)="loadChats()">
+          <i class="pi pi-refresh me-2" [class.pi-spin]="isLoading"></i>
+          Refresh
+        </button>
+      </div>
+
+      <!-- Filters and Search -->
+      <div class="card border-0 shadow-sm mb-4">
+        <div class="card-body">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <div class="input-group">
+                <span class="input-group-text">
+                  <i class="pi pi-search"></i>
+                </span>
+                <input
+                  type="text"
+                  class="form-control"
+                  placeholder="Search by user or writer name..."
+                  [(ngModel)]="searchTerm"
+                  (input)="onSearch()"
+                />
+              </div>
+            </div>
+            <div class="col-md-3">
+              <select
+                class="form-select"
+                [(ngModel)]="selectedFilter"
+                (change)="onFilterChange()"
+              >
+                <option value="All Chats">All Chats</option>
+                <option value="Active">Active</option>
+                <option value="Pending">Pending Assignment</option>
+                <option value="Flagged">Flagged</option>
+                <option value="Completed">Completed</option>
+              </select>
+            </div>
+            <div class="col-md-3">
+              <div class="text-muted small">
+                Showing {{ filteredChats.length }} of {{ chats.length }} chats
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Chats Table -->
+      <div class="card border-0 shadow-sm">
+        <div class="card-body p-0">
+          @if (isLoading) {
+            <div class="text-center py-5">
+              <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
+              </div>
+              <p class="mt-3 text-muted">Loading chats...</p>
+            </div>
+          } @else if (filteredChats.length === 0) {
+            <div class="text-center py-5">
+              <i class="pi pi-comments fs-1 text-muted mb-3"></i>
+              <h5 class="text-muted">No chats found</h5>
+              <p class="text-muted">Try adjusting your search or filter criteria</p>
+            </div>
+          } @else {
+            <div class="table-responsive">
+              <table class="table table-hover mb-0">
+                <thead class="table-light">
+                  <tr>
+                    <th>Chat ID</th>
+                    <th>User</th>
+                    <th>Writer</th>
+                    <th>Status</th>
+                    <th>Messages</th>
+                    <th>Last Activity</th>
+                    <th>Created</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (chat of filteredChats; track chat.id) {
+                    <tr>
+                      <td>
+                        <span class="fw-semibold">#{{ chat.id }}</span>
+                      </td>
+                      <td>
+                        <div class="d-flex align-items-center">
+                          <div class="bg-primary bg-opacity-10 rounded-circle p-2 me-2">
+                            <i class="pi pi-user text-primary"></i>
+                          </div>
+                          <span>{{ chat.user_name }}</span>
+                        </div>
+                      </td>
+                      <td>
+                        @if (chat.writer_name) {
+                          <div class="d-flex align-items-center">
+                            <div class="bg-success bg-opacity-10 rounded-circle p-2 me-2">
+                              <i class="pi pi-user-edit text-success"></i>
+                            </div>
+                            <span>{{ chat.writer_name }}</span>
+                          </div>
+                        } @else {
+                          <span class="text-muted">Unassigned</span>
+                        }
+                      </td>
+                      <td>
+                        <span class="badge" [class]="getStatusClass(chat.status)">
+                          {{ getStatusText(chat.status) }}
+                        </span>
+                        @if (chat.status === 'flagged' && chat.flagged_reason) {
+                          <div class="small text-danger mt-1">
+                            {{ chat.flagged_reason }}
+                          </div>
+                        }
+                      </td>
+                      <td>
+                        <span class="badge bg-info">{{ chat.messages_count }}</span>
+                      </td>
+                      <td>
+                        <small class="text-muted">{{ formatDateTime(chat.last_message_at) }}</small>
+                      </td>
+                      <td>
+                        <small class="text-muted">{{ formatDate(chat.created_at) }}</small>
+                      </td>
+                      <td>
+                        <div class="btn-group btn-group-sm">
+                          <button
+                            class="btn btn-outline-primary"
+                            (click)="onViewChat(chat)"
+                            title="View Chat"
+                          >
+                            <i class="pi pi-eye"></i>
+                          </button>
+                          @if (userRole === 'admin') {
+                            @if (!chat.writer_name && chat.status === 'pending') {
+                              <button
+                                class="btn btn-outline-success"
+                                (click)="onAssignWriter(chat)"
+                                title="Assign Writer"
+                              >
+                                <i class="pi pi-user-plus"></i>
+                              </button>
+                            }
+                            @if (chat.status === 'active') {
+                              <button
+                                class="btn btn-outline-warning"
+                                (click)="onFlagChat(chat)"
+                                title="Flag Chat"
+                              >
+                                <i class="pi pi-flag"></i>
+                              </button>
+                            }
+                            @if (chat.status === 'flagged') {
+                              <button
+                                class="btn btn-outline-success"
+                                (click)="onResolveFlag(chat)"
+                                title="Resolve Flag"
+                              >
+                                <i class="pi pi-check"></i>
+                              </button>
+                            }
+                          }
+                        </div>
+                      </td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

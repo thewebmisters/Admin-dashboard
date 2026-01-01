@@ -32,13 +32,13 @@ export class ProfileService {
         });
     }
 
-    // Get all profiles (paginated)
+    // Get all profiles (direct array response)
     getAllProfiles(
         perPage: number = 20,
         status?: 'active' | 'inactive',
         search?: string,
         page: number = 1
-    ): Observable<ApiResponse<PaginatedProfiles>> {
+    ): Observable<Profile[]> {
         let params = new HttpParams()
             .set('per_page', perPage.toString())
             .set('page', page.toString());
@@ -46,16 +46,17 @@ export class ProfileService {
         if (status) params = params.set('status', status);
         if (search) params = params.set('search', search);
 
-        return this.http.get<ApiResponse<PaginatedProfiles>>(
+        return this.http.get<Profile[]>(
             `${this.baseUrl}/profiles`,
             { headers: this.getHeaders(), params }
         );
     }
 
-    // Get featured profiles
-    getFeaturedProfiles(): Observable<ApiResponse<Profile[]>> {
-        return this.http.get<ApiResponse<Profile[]>>(
-            `${this.baseUrl}/profiles/featured`
+    // Get featured profiles (direct array response)
+    getFeaturedProfiles(): Observable<Profile[]> {
+        return this.http.get<Profile[]>(
+            `${this.baseUrl}/profiles/featured`,
+            { headers: this.getHeaders() }
         );
     }
 
