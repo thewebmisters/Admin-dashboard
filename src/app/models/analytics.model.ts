@@ -1,3 +1,39 @@
+export interface SystemHealth {
+    database_status: string;
+    storage_usage_percentage: number;
+    average_response_time_ms: number;
+    uptime_percentage: number;
+}
+
+export interface AdminAnalytics {
+    total_revenue: number;
+    revenue_today: number;
+    revenue_this_month: number;
+    total_tokens_in_circulation: number;
+    total_users: number;
+    active_users_today: number;
+    active_users_this_week: number;
+    new_users_today: number;
+    new_users_this_week: number;
+    total_profiles: number;
+    active_profiles: number;
+    total_writers: number;
+    active_writers_today: number;
+    total_messages: number;
+    messages_today: number;
+    total_chats: number;
+    active_chats: number;
+    unclaimed_chats: number;
+    total_reports: number;
+    pending_reports: number;
+    flagged_messages: number;
+    system_health: SystemHealth;
+}
+
+export interface AdminAnalyticsResponse {
+    analytics: AdminAnalytics;
+}
+
 export interface UserAnalytics {
     total_spending: string;
     total_tokens_purchased: number;
@@ -25,25 +61,6 @@ export interface WriterAnalytics {
     average_response_time_minutes: number;
     earnings_this_month: string;
     messages_this_month: number;
-}
-
-export interface AdminAnalytics {
-    total_users: number;
-    active_users: number;
-    total_profiles: number;
-    active_profiles: number;
-    total_writers: number;
-    active_writers: number;
-    total_revenue: string;
-    revenue_this_month: string;
-    total_chats: number;
-    active_chats: number;
-    total_messages: number;
-    messages_today: number;
-    pending_reports: number;
-    pending_verifications: number;
-    token_circulation: number;
-    average_tokens_per_user: number;
 }
 
 export interface ChartData {

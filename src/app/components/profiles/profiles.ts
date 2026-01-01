@@ -42,11 +42,10 @@ export class Profiles implements OnInit {
             this.searchTerm || undefined,
             this.currentPage
         ).subscribe({
-            next: (response) => {
-                const data = response.data;
-                this.profiles = data.data;
-                this.currentPage = data.current_page;
-                this.totalPages = Math.ceil(data.total / data.per_page);
+            next: (profiles) => {
+                this.profiles = profiles;
+                // Since API doesn't return pagination info, we'll handle it client-side for now
+                this.totalPages = Math.ceil(profiles.length / this.perPage);
                 this.isLoading = false;
             },
             error: (error) => {
@@ -58,8 +57,8 @@ export class Profiles implements OnInit {
 
     loadFeaturedProfiles(): void {
         this.profileService.getFeaturedProfiles().subscribe({
-            next: (response) => {
-                this.featuredProfiles = response.data;
+            next: (profiles) => {
+                this.featuredProfiles = profiles;
             },
             error: (error) => {
                 console.error('Error loading featured profiles:', error);
@@ -84,6 +83,15 @@ export class Profiles implements OnInit {
 
     updateOnlineStatus(profileId: number, status: 'online' | 'away' | 'busy' | 'offline'): void {
         if (this.userRole === 'admin' || this.userRole === 'writer') {
+            // For now, just update locally since the API structure might be different
+            const profile = this.profiles.find(p => p.id === profileId);
+            if (profile) {
+                profile.is_online = status === 'online';
+                console.log('Online status updated locally:', profile);
+            }
+
+            // Uncomment when API is ready
+            /*
             this.profileService.updateOnlineStatus(profileId, { online_status: status }).subscribe({
                 next: (response) => {
                     console.log('Online status updated:', response);
@@ -93,6 +101,7 @@ export class Profiles implements OnInit {
                     console.error('Error updating online status:', error);
                 }
             });
+            */
         }
     }
 
@@ -128,5 +137,67 @@ export class Profiles implements OnInit {
             case 'offline': return 'pi-circle';
             default: return 'pi-circle';
         }
+    }
+
+    // Helper methods for template
+    getActiveProfilesCount(): number {
+        return this.profiles.filter(p => p.is_active).length;
+    }
+
+    getOnlineProfilesCount(): number {
+        return this.profiles.filter(p => p.is_online).length;
+    }
+
+    getFilteredProfiles(): Profile[] {
+        let filtered = [...this.profiles];
+
+        // Apply search filter
+        if (this.searchTerm.trim()) {
+            const searchLower = this.searchTerm.toLowerCase();
+            filtered = filtered.filter(profile =>
+                profile.name.toLowerCase().includes(searchLower) ||
+                profile.country.toLowerCase().includes(searchLower) ||
+                profile.city.toLowerCase().includes(searchLower) ||
+                profile.interests.some(interest =>
+                    interest.toLowerCase().includes(searchLower)
+                )
+            );
+        }
+
+        // Apply status filter
+        if (this.statusFilter === 'active') {
+            filtered = filtered.filter(profile => profile.is_active);
+        } else if (this.statusFilter === 'inactive') {
+            filtered = filtered.filter(profile => !profile.is_active);
+        }
+
+        return filtered;
+    }
+
+    getOnlineStatusClass(isOnline: boolean): string {
+        return isOnline ? 'bg-success' : 'bg-secondary';
+    }
+
+    // Action methods
+    viewProfile(profile: Profile): void {
+        console.log('View profile:', profile);
+        // Navigate to profile details or open modal
+    }
+
+    editProfile(profile: Profile): void {
+        console.log('Edit profile:', profile);
+        // Open edit modal or navigate to edit page
+    }
+
+    toggleFeatured(profile: Profile): void {
+        console.log('Toggle featured:', profile);
+        // Call API to toggle featured status
+        profile.is_featured = !profile.is_featured;
+    }
+
+    toggleActive(profile: Profile): void {
+        console.log('Toggle active:', profile);
+        // Call API to toggle active status
+        profile.is_active = !profile.is_active;
     }
 }

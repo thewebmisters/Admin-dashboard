@@ -3,25 +3,31 @@ export interface Profile {
     name: string;
     age: number;
     bio: string;
-    interests?: string[];
+    interests: string[];
     profile_photo: string;
-    gallery?: GalleryPhoto[];
+    gallery: GalleryPhoto[];
     country: string;
     city: string;
     is_online: boolean;
-    is_verified: boolean;
-    online_status?: 'online' | 'away' | 'busy' | 'offline';
-    last_seen_at?: string;
+    last_seen_at: string | null;
+    is_active: boolean;
+    is_featured: boolean;
+    total_chats: number;
+    response_rate: number;
+    average_response_time: number | null;
+    total_earnings: string;
     created_at: string;
-    is_featured?: boolean;
-    featured_until?: string;
-    assigned_at?: string;
+    updated_at: string;
+    deleted_at: string | null;
 }
 
 export interface GalleryPhoto {
     id: number;
-    photo_path: string;
-    caption?: string;
+    profile_id: number;
+    image_path: string;
+    sort_order: number;
+    created_at: string;
+    updated_at: string;
 }
 
 export interface PaginatedProfiles {
