@@ -29,7 +29,7 @@ export class Login {
     });
 
     // Debug: Check if MessageService is properly injected
-    console.log('MessageService injected:', this.messageService);
+    //  console.log('MessageService injected:', this.messageService);
   }
 
   ngOnInit(): void { }

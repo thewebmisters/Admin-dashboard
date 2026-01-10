@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../services/auth.service';
+import { Layout } from '../shared/layout/layout';
 
 interface ChatData {
     id: number;
@@ -16,7 +17,7 @@ interface ChatData {
 
 @Component({
     selector: 'app-chat',
-    imports: [FormsModule, CommonModule],
+    imports: [FormsModule, CommonModule, Layout],
     templateUrl: './chat.html',
     styleUrl: './chat.css',
 })

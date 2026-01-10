@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../services/auth.service';
+import { Layout } from '../shared/layout/layout';
 
 interface Report {
     id: number;
@@ -17,7 +18,7 @@ interface Report {
 
 @Component({
     selector: 'app-reports',
-    imports: [FormsModule, CommonModule],
+    imports: [FormsModule, CommonModule, Layout],
     templateUrl: './reports.html',
     styleUrl: './reports.css',
 })
