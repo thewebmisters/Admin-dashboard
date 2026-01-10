@@ -7,10 +7,11 @@ import { MessageService } from 'primeng/api';
 import { AuthService } from '../../services/auth.service';
 import { UserService } from '../../services/user.service';
 import { User, UserStats, UserFilters } from '../../models/user.model';
+import { Layout } from '../shared/layout/layout';
 
 @Component({
   selector: 'app-users',
-  imports: [FormsModule, ReactiveFormsModule, CommonModule],
+  imports: [FormsModule, ReactiveFormsModule, CommonModule, Layout],
   templateUrl: './users.html',
   styleUrl: './users.css',
 })

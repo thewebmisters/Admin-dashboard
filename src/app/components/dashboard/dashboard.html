@@ -1,61 +1,85 @@
 <div class="d-flex vh-100 position-relative">
   <!-- Mobile Menu Backdrop -->
-  <div class="position-fixed top-0 start-0 w-100 h-100 bg-dark bg-opacity-50 d-md-none"
-       style="z-index: 1040;"
-       [class.d-none]="!isMobileMenuOpen"
-       (click)="toggleMobileMenu()"></div>
+  <div
+    class="position-fixed top-0 start-0 w-100 h-100 bg-dark bg-opacity-50 d-md-none"
+    style="z-index: 1040"
+    [class.d-none]="!isMobileMenuOpen"
+    (click)="toggleMobileMenu()"
+  ></div>
   <!-- Sidebar Navigation -->
-  <aside class="bg-dark text-light d-flex flex-column position-fixed position-md-relative" 
-         style="width: 280px; min-height: 100vh; z-index: 1050;"
-         [class.d-none]="!isMobileMenuOpen"
-         [class.d-md-flex]="true">
-    <div class="d-flex align-items-center justify-content-between p-4 border-bottom border-secondary">
+  <aside
+    class="bg-dark text-light d-flex flex-column position-fixed position-md-relative"
+    style="width: 280px; min-height: 100vh; z-index: 1050"
+    [class.d-none]="!isMobileMenuOpen"
+    [class.d-md-flex]="true"
+  >
+    <div
+      class="d-flex align-items-center justify-content-between p-4 border-bottom border-secondary"
+    >
       <div class="d-flex align-items-center">
         <i class="pi pi-shield fs-3 me-2"></i>
         <h1 class="h4 mb-0 fw-bold">Admin Panel</h1>
       </div>
       <!-- Close button for mobile -->
-      <button class="btn btn-outline-light d-md-none" 
-              (click)="toggleMobileMenu()"
-              type="button">
+      <button class="btn btn-outline-light d-md-none" (click)="toggleMobileMenu()" type="button">
         <i class="pi pi-times"></i>
       </button>
     </div>
-    
+
     <!-- Navigation Menu -->
     <nav class="flex-fill p-3">
       <div class="nav flex-column nav-pills">
-        <a (click)="onNavigate('dashboard')" 
-           class="nav-link active d-flex align-items-center mb-2 text-light bg-primary rounded">
+        <a
+          (click)="onNavigate('dashboard')"
+          class="nav-link active d-flex align-items-center mb-2 text-light bg-primary rounded"
+        >
           <i class="pi pi-home me-3"></i> Dashboard
         </a>
-        <a (click)="onNavigate('profiles')" 
-           class="nav-link d-flex align-items-center mb-2 text-light hover-bg-secondary rounded">
+        <a
+          (click)="onNavigate('profiles')"
+          class="nav-link d-flex align-items-center mb-2 text-light hover-bg-secondary rounded"
+        >
           <i class="pi pi-users me-3"></i> Profile Management
         </a>
-        <a (click)="onNavigate('users')" 
-           class="nav-link d-flex align-items-center mb-2 text-light hover-bg-secondary rounded">
+        <a
+          (click)="onNavigate('users')"
+          class="nav-link d-flex align-items-center mb-2 text-light hover-bg-secondary rounded"
+        >
           <i class="pi pi-user me-3"></i> User Management
         </a>
-        <a (click)="onNavigate('chat')" 
-           class="nav-link d-flex align-items-center mb-2 text-light hover-bg-secondary rounded">
+        <a
+          (click)="onNavigate('chat')"
+          class="nav-link d-flex align-items-center mb-2 text-light hover-bg-secondary rounded"
+        >
           <i class="pi pi-comments me-3"></i> Chat Moderation
         </a>
-        <a (click)="onNavigate('payouts')" 
-           class="nav-link d-flex align-items-center mb-2 text-light hover-bg-secondary rounded">
+        <a
+          (click)="onNavigate('payouts')"
+          class="nav-link d-flex align-items-center mb-2 text-light hover-bg-secondary rounded"
+        >
           <i class="pi pi-dollar me-3"></i> Payouts & Earnings
         </a>
-        <a (click)="onNavigate('reports')" 
-           class="nav-link d-flex align-items-center mb-2 text-light hover-bg-secondary rounded">
+        <a
+          (click)="onNavigate('reports')"
+          class="nav-link d-flex align-items-center mb-2 text-light hover-bg-secondary rounded"
+        >
           <i class="pi pi-chart-bar me-3"></i> Reports
+        </a>
+        <a
+          (click)="onNavigate('configurations')"
+          class="nav-link d-flex align-items-center mb-2 text-light hover-bg-secondary rounded"
+        >
+          <i class="pi pi-chart-bar me-3"></i> System Configurations
         </a>
       </div>
     </nav>
-    
+
     <!-- Logout Section -->
     <div class="p-3 border-top border-secondary">
-      <a (click)="onLogout()" 
-         class="nav-link d-flex align-items-center text-danger hover-bg-secondary rounded">
+      <a
+        (click)="onLogout()"
+        class="nav-link d-flex align-items-center text-danger hover-bg-secondary rounded"
+      >
         <i class="pi pi-sign-out me-3"></i> Logout
       </a>
     </div>
@@ -68,47 +92,62 @@
       <div class="d-flex justify-content-between align-items-center">
         <div class="d-flex align-items-center">
           <!-- Mobile Menu Toggle -->
-          <button class="btn btn-outline-secondary d-md-none me-3" 
-                  (click)="toggleMobileMenu()"
-                  type="button">
+          <button
+            class="btn btn-outline-secondary d-md-none me-3"
+            (click)="toggleMobileMenu()"
+            type="button"
+          >
             <i class="pi pi-bars"></i>
           </button>
-          
+
           <div>
             <h2 class="h3 mb-1 text-dark fw-bold">Dashboard</h2>
             <p class="text-muted mb-0 small d-none d-sm-block">
-              Welcome back! Here's what's happening with your platform.
-              @if (lastRefreshTime) {
-                <span class="ms-2">Last updated: {{ getLastRefreshTime() }}</span>
+              Welcome back! Here's what's happening with your platform. @if (lastRefreshTime) {
+              <span class="ms-2">Last updated: {{ getLastRefreshTime() }}</span>
               }
             </p>
           </div>
         </div>
-        
+
         <!-- Header Actions -->
         <div class="d-flex align-items-center gap-3">
           <!-- User Profile Dropdown -->
           <div class="dropdown">
-            <button class="btn btn-outline-secondary dropdown-toggle d-flex align-items-center" 
-                    type="button" 
-                    id="userDropdown" 
-                    data-bs-toggle="dropdown" 
-                    aria-expanded="false">
+            <button
+              class="btn btn-outline-secondary dropdown-toggle d-flex align-items-center"
+              type="button"
+              id="userDropdown"
+              data-bs-toggle="dropdown"
+              aria-expanded="false"
+            >
               <i class="pi pi-user me-2"></i>
-              <span class="d-none d-md-inline">{{ authService.getCurrentUser()?.name || 'User' }}</span>
+              <span class="d-none d-md-inline">{{
+                authService.getCurrentUser()?.name || 'User'
+              }}</span>
             </button>
             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
               <li><h6 class="dropdown-header">Account</h6></li>
-              <li><a class="dropdown-item" (click)="onNavigate('admin-profile')"><i class="pi pi-user me-2"></i>Profile Settings</a></li>
-              <li><a class="dropdown-item" href="#"><i class="pi pi-cog me-2"></i>Account Settings</a></li>
-              <li><hr class="dropdown-divider"></li>
-              <li><a class="dropdown-item text-danger" (click)="onLogout()"><i class="pi pi-sign-out me-2"></i>Logout</a></li>
+              <li>
+                <a class="dropdown-item" (click)="onNavigate('admin-profile')"
+                  ><i class="pi pi-user me-2"></i>Profile Settings</a
+                >
+              </li>
+              <li>
+                <a class="dropdown-item" href="#"><i class="pi pi-cog me-2"></i>Account Settings</a>
+              </li>
+              <li><hr class="dropdown-divider" /></li>
+              <li>
+                <a class="dropdown-item text-danger" (click)="onLogout()"
+                  ><i class="pi pi-sign-out me-2"></i>Logout</a
+                >
+              </li>
             </ul>
           </div>
-          
+
           <!-- Refresh Button -->
-          <button 
-            (click)="refreshData()" 
+          <button
+            (click)="refreshData()"
             class="btn btn-primary d-flex align-items-center"
             [disabled]="isLoading"
           >
@@ -135,18 +174,18 @@
                 <div class="flex-grow-1 ms-3">
                   <h6 class="text-muted mb-1 fw-semibold">{{ getStatLabels().label1 }}</h6>
                   @if (isLoading) {
-                    <div class="placeholder-glow">
-                      <span class="placeholder col-8 placeholder-lg"></span>
-                    </div>
+                  <div class="placeholder-glow">
+                    <span class="placeholder col-8 placeholder-lg"></span>
+                  </div>
                   } @else {
-                    <h4 class="mb-0 fw-bold text-dark">{{ getStats().totalRevenue }}</h4>
+                  <h4 class="mb-0 fw-bold text-dark">{{ getStats().totalRevenue }}</h4>
                   }
                 </div>
               </div>
             </div>
           </div>
         </div>
-        
+
         <div class="col-12 col-sm-6 col-lg-3">
           <div class="card h-100 border-0 shadow-sm">
             <div class="card-body">
@@ -159,18 +198,18 @@
                 <div class="flex-grow-1 ms-3">
                   <h6 class="text-muted mb-1 fw-semibold">{{ getStatLabels().label2 }}</h6>
                   @if (isLoading) {
-                    <div class="placeholder-glow">
-                      <span class="placeholder col-8 placeholder-lg"></span>
-                    </div>
+                  <div class="placeholder-glow">
+                    <span class="placeholder col-8 placeholder-lg"></span>
+                  </div>
                   } @else {
-                    <h4 class="mb-0 fw-bold text-dark">{{ getStats().activeUsers }}</h4>
+                  <h4 class="mb-0 fw-bold text-dark">{{ getStats().activeUsers }}</h4>
                   }
                 </div>
               </div>
             </div>
           </div>
         </div>
-        
+
         <div class="col-12 col-sm-6 col-lg-3">
           <div class="card h-100 border-0 shadow-sm">
             <div class="card-body">
@@ -183,18 +222,18 @@
                 <div class="flex-grow-1 ms-3">
                   <h6 class="text-muted mb-1 fw-semibold">{{ getStatLabels().label3 }}</h6>
                   @if (isLoading) {
-                    <div class="placeholder-glow">
-                      <span class="placeholder col-8 placeholder-lg"></span>
-                    </div>
+                  <div class="placeholder-glow">
+                    <span class="placeholder col-8 placeholder-lg"></span>
+                  </div>
                   } @else {
-                    <h4 class="mb-0 fw-bold text-dark">{{ getStats().pendingReports }}</h4>
+                  <h4 class="mb-0 fw-bold text-dark">{{ getStats().pendingReports }}</h4>
                   }
                 </div>
               </div>
             </div>
           </div>
         </div>
-        
+
         <div class="col-12 col-sm-6 col-lg-3">
           <div class="card h-100 border-0 shadow-sm">
             <div class="card-body">
@@ -207,11 +246,11 @@
                 <div class="flex-grow-1 ms-3">
                   <h6 class="text-muted mb-1 fw-semibold">{{ getStatLabels().label4 }}</h6>
                   @if (isLoading) {
-                    <div class="placeholder-glow">
-                      <span class="placeholder col-8 placeholder-lg"></span>
-                    </div>
+                  <div class="placeholder-glow">
+                    <span class="placeholder col-8 placeholder-lg"></span>
+                  </div>
                   } @else {
-                    <h4 class="mb-0 fw-bold text-danger">{{ getStats().totalMessages }}</h4>
+                  <h4 class="mb-0 fw-bold text-danger">{{ getStats().totalMessages }}</h4>
                   }
                 </div>
               </div>
@@ -224,102 +263,99 @@
       <div class="row">
         <!-- System Health Card (Admin Only) -->
         @if (userRole === 'admin' && adminStats?.system_health) {
-          <div class="col-12 mb-4">
-            <div class="card border-0 shadow-sm">
-              <div class="card-header bg-white border-0 py-3">
-                <h5 class="card-title mb-0 fw-bold">
-                  <i class="pi pi-shield me-2 text-success"></i>
-                  System Health
-                </h5>
-              </div>
-              <div class="card-body">
-                <div class="row g-3">
-                  <div class="col-6 col-md-3">
-                    <div class="text-center">
-                      <div class="mb-2">
-                        <i class="pi pi-database fs-4" 
-                           [class]="getDatabaseStatus() === 'operational' ? 'text-success' : 'text-danger'"></i>
-                      </div>
-                      <h6 class="mb-1">Database</h6>
-                      <span class="badge" 
-                            [class]="getDatabaseStatus() === 'operational' ? 'bg-success' : 'bg-danger'">
-                        {{ getDatabaseStatus() | titlecase }}
-                      </span>
+        <div class="col-12 mb-4">
+          <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white border-0 py-3">
+              <h5 class="card-title mb-0 fw-bold">
+                <i class="pi pi-shield me-2 text-success"></i>
+                System Health
+              </h5>
+            </div>
+            <div class="card-body">
+              <div class="row g-3">
+                <div class="col-6 col-md-3">
+                  <div class="text-center">
+                    <div class="mb-2">
+                      <i
+                        class="pi pi-database fs-4"
+                        [class]="
+                          getDatabaseStatus() === 'operational' ? 'text-success' : 'text-danger'
+                        "
+                      ></i>
                     </div>
+                    <h6 class="mb-1">Database</h6>
+                    <span
+                      class="badge"
+                      [class]="getDatabaseStatus() === 'operational' ? 'bg-success' : 'bg-danger'"
+                    >
+                      {{ getDatabaseStatus() | titlecase }}
+                    </span>
                   </div>
-                  <div class="col-6 col-md-3">
-                    <div class="text-center">
-                      <div class="mb-2">
-                        <i class="pi pi-server fs-4 text-info"></i>
-                      </div>
-                      <h6 class="mb-1">Storage</h6>
-                      <span class="text-muted">{{ getStorageUsage() | number:'1.1-1' }}% Used</span>
+                </div>
+                <div class="col-6 col-md-3">
+                  <div class="text-center">
+                    <div class="mb-2">
+                      <i class="pi pi-server fs-4 text-info"></i>
                     </div>
+                    <h6 class="mb-1">Storage</h6>
+                    <span class="text-muted">{{ getStorageUsage() | number : '1.1-1' }}% Used</span>
                   </div>
-                  <div class="col-6 col-md-3">
-                    <div class="text-center">
-                      <div class="mb-2">
-                        <i class="pi pi-clock fs-4 text-warning"></i>
-                      </div>
-                      <h6 class="mb-1">Response Time</h6>
-                      <span class="text-muted">{{ getResponseTime() }}ms</span>
+                </div>
+                <div class="col-6 col-md-3">
+                  <div class="text-center">
+                    <div class="mb-2">
+                      <i class="pi pi-clock fs-4 text-warning"></i>
                     </div>
+                    <h6 class="mb-1">Response Time</h6>
+                    <span class="text-muted">{{ getResponseTime() }}ms</span>
                   </div>
-                  <div class="col-6 col-md-3">
-                    <div class="text-center">
-                      <div class="mb-2">
-                        <i class="pi pi-check-circle fs-4 text-success"></i>
-                      </div>
-                      <h6 class="mb-1">Uptime</h6>
-                      <span class="text-muted">{{ getUptimePercentage() | number:'1.2-2' }}%</span>
+                </div>
+                <div class="col-6 col-md-3">
+                  <div class="text-center">
+                    <div class="mb-2">
+                      <i class="pi pi-check-circle fs-4 text-success"></i>
                     </div>
+                    <h6 class="mb-1">Uptime</h6>
+                    <span class="text-muted">{{ getUptimePercentage() | number : '1.2-2' }}%</span>
                   </div>
                 </div>
               </div>
             </div>
           </div>
+        </div>
         }
-        
+
         <div class="col-12">
           <div class="card border-0 shadow-sm">
             <div class="card-header bg-white border-0 py-3">
               <div class="d-flex justify-content-between align-items-center">
                 <div>
                   <h5 class="card-title mb-1 fw-bold">
-                    @if (userRole === 'admin') {
-                      Revenue Analytics
-                    } @else if (userRole === 'writer') {
-                      Earnings Overview
-                    } @else {
-                      Spending Analytics
-                    }
+                    @if (userRole === 'admin') { Revenue Analytics } @else if (userRole ===
+                    'writer') { Earnings Overview } @else { Spending Analytics }
                   </h5>
                   <p class="text-muted mb-0 small">
-                    @if (userRole === 'admin') {
-                      Platform revenue over the last 30 days
-                    } @else if (userRole === 'writer') {
-                      Your earnings performance over time
-                    } @else {
-                      Your spending patterns over time
-                    }
+                    @if (userRole === 'admin') { Platform revenue over the last 30 days } @else if
+                    (userRole === 'writer') { Your earnings performance over time } @else { Your
+                    spending patterns over time }
                   </p>
                 </div>
                 @if (isLoading) {
-                  <div class="placeholder-glow">
-                    <span class="placeholder col-4"></span>
-                  </div>
+                <div class="placeholder-glow">
+                  <span class="placeholder col-4"></span>
+                </div>
                 }
               </div>
             </div>
             <div class="card-body">
               @if (isLoading) {
-                <div class="placeholder-glow">
-                  <div class="placeholder col-12" style="height: 300px;"></div>
-                </div>
+              <div class="placeholder-glow">
+                <div class="placeholder col-12" style="height: 300px"></div>
+              </div>
               } @else {
-                <div style="height: 300px; position: relative;">
-                  <canvas #revenueChart></canvas>
-                </div>
+              <div style="height: 300px; position: relative">
+                <canvas #revenueChart></canvas>
+              </div>
               }
             </div>
           </div>
@@ -339,78 +375,98 @@
             <div class="card-body">
               <div class="row g-3">
                 @if (userRole === 'admin') {
-                  <div class="col-6 col-md-3">
-                    <button class="btn btn-outline-primary w-100 h-100 d-flex flex-column align-items-center justify-content-center py-3"
-                            (click)="onNavigate('users')">
-                      <i class="pi pi-users fs-4 mb-2"></i>
-                      <span>Manage Users</span>
-                    </button>
-                  </div>
-                  <div class="col-6 col-md-3">
-                    <button class="btn btn-outline-success w-100 h-100 d-flex flex-column align-items-center justify-content-center py-3"
-                            (click)="onNavigate('profiles')">
-                      <i class="pi pi-user-edit fs-4 mb-2"></i>
-                      <span>Manage Profiles</span>
-                    </button>
-                  </div>
-                  <div class="col-6 col-md-3">
-                    <button class="btn btn-outline-warning w-100 h-100 d-flex flex-column align-items-center justify-content-center py-3"
-                            (click)="onNavigate('reports')">
-                      <i class="pi pi-exclamation-triangle fs-4 mb-2"></i>
-                      <span>View Reports</span>
-                    </button>
-                  </div>
-                  <div class="col-6 col-md-3">
-                    <button class="btn btn-outline-info w-100 h-100 d-flex flex-column align-items-center justify-content-center py-3"
-                            (click)="onNavigate('payouts')">
-                      <i class="pi pi-dollar fs-4 mb-2"></i>
-                      <span>Manage Payouts</span>
-                    </button>
-                  </div>
+                <div class="col-6 col-md-3">
+                  <button
+                    class="btn btn-outline-primary w-100 h-100 d-flex flex-column align-items-center justify-content-center py-3"
+                    (click)="onNavigate('users')"
+                  >
+                    <i class="pi pi-users fs-4 mb-2"></i>
+                    <span>Manage Users</span>
+                  </button>
+                </div>
+                <div class="col-6 col-md-3">
+                  <button
+                    class="btn btn-outline-success w-100 h-100 d-flex flex-column align-items-center justify-content-center py-3"
+                    (click)="onNavigate('profiles')"
+                  >
+                    <i class="pi pi-user-edit fs-4 mb-2"></i>
+                    <span>Manage Profiles</span>
+                  </button>
+                </div>
+                <div class="col-6 col-md-3">
+                  <button
+                    class="btn btn-outline-warning w-100 h-100 d-flex flex-column align-items-center justify-content-center py-3"
+                    (click)="onNavigate('reports')"
+                  >
+                    <i class="pi pi-exclamation-triangle fs-4 mb-2"></i>
+                    <span>View Reports</span>
+                  </button>
+                </div>
+                <div class="col-6 col-md-3">
+                  <button
+                    class="btn btn-outline-info w-100 h-100 d-flex flex-column align-items-center justify-content-center py-3"
+                    (click)="onNavigate('payouts')"
+                  >
+                    <i class="pi pi-dollar fs-4 mb-2"></i>
+                    <span>Manage Payouts</span>
+                  </button>
+                </div>
                 } @else if (userRole === 'writer') {
-                  <div class="col-6 col-md-4">
-                    <button class="btn btn-outline-primary w-100 h-100 d-flex flex-column align-items-center justify-content-center py-3"
-                            (click)="onNavigate('chats')">
-                      <i class="pi pi-comments fs-4 mb-2"></i>
-                      <span>Active Chats</span>
-                    </button>
-                  </div>
-                  <div class="col-6 col-md-4">
-                    <button class="btn btn-outline-success w-100 h-100 d-flex flex-column align-items-center justify-content-center py-3"
-                            (click)="onNavigate('earnings')">
-                      <i class="pi pi-chart-line fs-4 mb-2"></i>
-                      <span>View Earnings</span>
-                    </button>
-                  </div>
-                  <div class="col-6 col-md-4">
-                    <button class="btn btn-outline-info w-100 h-100 d-flex flex-column align-items-center justify-content-center py-3"
-                            (click)="onNavigate('profile')">
-                      <i class="pi pi-user fs-4 mb-2"></i>
-                      <span>My Profile</span>
-                    </button>
-                  </div>
+                <div class="col-6 col-md-4">
+                  <button
+                    class="btn btn-outline-primary w-100 h-100 d-flex flex-column align-items-center justify-content-center py-3"
+                    (click)="onNavigate('chats')"
+                  >
+                    <i class="pi pi-comments fs-4 mb-2"></i>
+                    <span>Active Chats</span>
+                  </button>
+                </div>
+                <div class="col-6 col-md-4">
+                  <button
+                    class="btn btn-outline-success w-100 h-100 d-flex flex-column align-items-center justify-content-center py-3"
+                    (click)="onNavigate('earnings')"
+                  >
+                    <i class="pi pi-chart-line fs-4 mb-2"></i>
+                    <span>View Earnings</span>
+                  </button>
+                </div>
+                <div class="col-6 col-md-4">
+                  <button
+                    class="btn btn-outline-info w-100 h-100 d-flex flex-column align-items-center justify-content-center py-3"
+                    (click)="onNavigate('profile')"
+                  >
+                    <i class="pi pi-user fs-4 mb-2"></i>
+                    <span>My Profile</span>
+                  </button>
+                </div>
                 } @else {
-                  <div class="col-6 col-md-4">
-                    <button class="btn btn-outline-primary w-100 h-100 d-flex flex-column align-items-center justify-content-center py-3"
-                            (click)="onNavigate('chats')">
-                      <i class="pi pi-comments fs-4 mb-2"></i>
-                      <span>My Chats</span>
-                    </button>
-                  </div>
-                  <div class="col-6 col-md-4">
-                    <button class="btn btn-outline-success w-100 h-100 d-flex flex-column align-items-center justify-content-center py-3"
-                            (click)="onNavigate('tokens')">
-                      <i class="pi pi-money-bill fs-4 mb-2"></i>
-                      <span>Buy Tokens</span>
-                    </button>
-                  </div>
-                  <div class="col-6 col-md-4">
-                    <button class="btn btn-outline-info w-100 h-100 d-flex flex-column align-items-center justify-content-center py-3"
-                            (click)="onNavigate('profile')">
-                      <i class="pi pi-user fs-4 mb-2"></i>
-                      <span>My Profile</span>
-                    </button>
-                  </div>
+                <div class="col-6 col-md-4">
+                  <button
+                    class="btn btn-outline-primary w-100 h-100 d-flex flex-column align-items-center justify-content-center py-3"
+                    (click)="onNavigate('chats')"
+                  >
+                    <i class="pi pi-comments fs-4 mb-2"></i>
+                    <span>My Chats</span>
+                  </button>
+                </div>
+                <div class="col-6 col-md-4">
+                  <button
+                    class="btn btn-outline-success w-100 h-100 d-flex flex-column align-items-center justify-content-center py-3"
+                    (click)="onNavigate('tokens')"
+                  >
+                    <i class="pi pi-money-bill fs-4 mb-2"></i>
+                    <span>Buy Tokens</span>
+                  </button>
+                </div>
+                <div class="col-6 col-md-4">
+                  <button
+                    class="btn btn-outline-info w-100 h-100 d-flex flex-column align-items-center justify-content-center py-3"
+                    (click)="onNavigate('profile')"
+                  >
+                    <i class="pi pi-user fs-4 mb-2"></i>
+                    <span>My Profile</span>
+                  </button>
+                </div>
                 }
               </div>
             </div>

@@ -1,0 +1,76 @@
+<div class="d-flex vh-100 position-relative">
+  <!-- Navbar Component -->
+  <app-navbar></app-navbar>
+
+  <!-- Main Content Area -->
+  <main class="flex-fill d-flex flex-column w-100">
+    <!-- Header -->
+    <header class="bg-white border-bottom shadow-sm p-4">
+      <div class="d-flex justify-content-between align-items-center">
+        <div class="d-flex align-items-center">
+          <!-- Mobile Menu Toggle -->
+          <button class="btn btn-outline-secondary d-md-none me-3" 
+                  (click)="toggleMobileMenu()"
+                  type="button">
+            <i class="pi pi-bars"></i>
+          </button>
+          
+          <div>
+            <h2 class="h3 mb-1 text-dark fw-bold">{{ pageTitle }}</h2>
+            @if (pageDescription) {
+              <p class="text-muted mb-0 small d-none d-sm-block">{{ pageDescription }}</p>
+            }
+          </div>
+        </div>
+        
+        <!-- Header Actions -->
+        <div class="d-flex align-items-center gap-3">
+          <!-- User Profile Dropdown -->
+          <div class="dropdown">
+            <button class="btn btn-outline-secondary dropdown-toggle d-flex align-items-center" 
+                    type="button" 
+                    id="userDropdown" 
+                    data-bs-toggle="dropdown" 
+                    aria-expanded="false">
+              <i class="pi pi-user me-2"></i>
+              <span class="d-none d-md-inline">{{ authService.getCurrentUser()?.name || 'User' }}</span>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+              <li><h6 class="dropdown-header">Account</h6></li>
+              <li><a class="dropdown-item" routerLink="/admin-profile"><i class="pi pi-user me-2"></i>Profile Settings</a></li>
+              <li><a class="dropdown-item" href="#"><i class="pi pi-cog me-2"></i>Account Settings</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><a class="dropdown-item text-danger" (click)="authService.logout()"><i class="pi pi-sign-out me-2"></i>Logout</a></li>
+            </ul>
+          </div>
+          
+          <!-- Action Buttons -->
+          @if (showRefreshButton) {
+            <button 
+              (click)="onRefresh()" 
+              class="btn btn-outline-primary d-flex align-items-center"
+            >
+              <i class="pi pi-refresh me-2"></i>
+              <span class="d-none d-md-inline">Refresh</span>
+            </button>
+          }
+          
+          @if (showAddButton) {
+            <button 
+              (click)="onAdd()" 
+              class="btn btn-primary d-flex align-items-center"
+            >
+              <i class="{{ addButtonIcon }} me-2"></i>
+              <span class="d-none d-md-inline">{{ addButtonText }}</span>
+            </button>
+          }
+        </div>
+      </div>
+    </header>
+
+    <!-- Page Content -->
+    <div class="flex-fill p-4 bg-light overflow-auto">
+      <ng-content></ng-content>
+    </div>
+  </main>
+</div>

@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../services/auth.service';
+import { Layout } from '../shared/layout/layout';
 
 interface Payout {
     id: number;
@@ -18,7 +19,7 @@ interface Payout {
 
 @Component({
     selector: 'app-payouts',
-    imports: [FormsModule, CommonModule],
+    imports: [FormsModule, CommonModule, Layout],
     templateUrl: './payouts.html',
     styleUrl: './payouts.css',
 })
