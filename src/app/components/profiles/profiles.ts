@@ -4,10 +4,11 @@ import { FormsModule } from '@angular/forms';
 import { ProfileService } from '../../services/profile.service';
 import { AuthService } from '../../services/auth.service';
 import { Profile, PaginatedProfiles } from '../../models/profile.model';
+import { Layout } from '../shared/layout/layout';
 
 @Component({
     selector: 'app-profiles',
-    imports: [CommonModule, FormsModule],
+    imports: [CommonModule, FormsModule, Layout],
     templateUrl: './profiles.html',
     styleUrl: './profiles.css',
 })

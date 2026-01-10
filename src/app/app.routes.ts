@@ -7,6 +7,7 @@ import { Chat } from './components/chat/chat';
 import { Payouts } from './components/payouts/payouts';
 import { Reports } from './components/reports/reports';
 import { AdminProfile } from './components/admin-profile/admin-profile';
+import { Configurations } from './components/configurations/configurations';
 import { AuthGuard } from './guards/auth.guard';
 import { AdminGuard } from './guards/admin.guard';
 
@@ -46,6 +47,11 @@ export const routes: Routes = [
     {
         path: 'admin-profile',
         component: AdminProfile,
+        canActivate: [AdminGuard]
+    },
+    {
+        path: 'configurations',
+        component: Configurations,
         canActivate: [AdminGuard]
     },
     { path: '**', redirectTo: '/login' }
